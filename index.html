@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iron Log</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=JetBrains+Mono:wght@500&display=swap');
+
+  :root{
+    --bg:#1c1a18;
+    --surface:#262320;
+    --surface-2:#312c28;
+    --text:#f1ece2;
+    --text-dim:#a39c92;
+    --accent:#c1592f;
+    --accent-text:#fbe6db;
+    --brass:#d4a24e;
+    --brass-text:#3a2a0d;
+    --border:#3d3732;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height:1.5;
+    padding-bottom:90px;
+  }
+
+  header{
+    padding:1.5rem 1.25rem 1rem;
+    border-bottom:1px solid var(--border);
+  }
+
+  h1{
+    font-family:'Oswald', sans-serif;
+    font-weight:600;
+    letter-spacing:0.08em;
+    font-size:1.6rem;
+    margin:0;
+    text-transform:uppercase;
+    color:var(--accent);
+  }
+
+  .subtitle{
+    color:var(--text-dim);
+    font-size:0.85rem;
+    margin-top:0.25rem;
+  }
+
+  nav{
+    display:flex;
+    overflow-x:auto;
+    gap:0.5rem;
+    padding:1rem 1.25rem 0;
+    border-bottom:1px solid var(--border);
+  }
+
+  .tab{
+    flex:0 0 auto;
+    background:none;
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    font-family:'Oswald', sans-serif;
+    font-size:0.8rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    padding:0.6rem 0.9rem;
+    border-radius:6px 6px 0 0;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+
+  .tab.active{
+    color:var(--bg);
+    background:var(--accent);
+    border-color:var(--accent);
+  }
+
+  main{ padding:1.25rem; max-width:640px; margin:0 auto; }
+
+  .day-head{
+    font-family:'Oswald', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    font-size:1.1rem;
+    margin:0 0 0.25rem;
+  }
+
+  .day-sub{ color:var(--text-dim); font-size:0.85rem; margin:0 0 1.25rem; }
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:1rem 1rem 0.85rem;
+    margin-bottom:1rem;
+  }
+
+  .ex-name-row{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:0.5rem;
+  }
+
+  .ex-name{ font-weight:600; font-size:1rem; }
+
+  .ex-target{ color:var(--text-dim); font-size:0.78rem; font-family:'JetBrains Mono', monospace; }
+
+  .pr-badge{
+    background:var(--brass);
+    color:var(--brass-text);
+    font-family:'Oswald', sans-serif;
+    font-size:0.7rem;
+    letter-spacing:0.08em;
+    padding:0.15rem 0.5rem;
+    border-radius:4px;
+    text-transform:uppercase;
+    display:none;
+  }
+
+  .last-time{
+    color:var(--text-dim);
+    font-size:0.78rem;
+    margin:0.35rem 0 0.6rem;
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  .set-row{
+    display:flex;
+    align-items:center;
+    gap:0.5rem;
+    margin-bottom:0.4rem;
+  }
+
+  .set-num{
+    width:1.4rem;
+    color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.8rem;
+    text-align:center;
+  }
+
+  .set-row input{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:5px;
+    padding:0.45rem 0.5rem;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.9rem;
+    width:100%;
+    text-align:center;
+  }
+
+  .set-row input:focus{ outline:1px solid var(--accent); border-color:var(--accent); }
+
+  .unit{ color:var(--text-dim); font-size:0.75rem; width:2.5rem; }
+
+  .remove-set{
+    background:none;
+    border:none;
+    color:var(--text-dim);
+    font-size:1.1rem;
+    cursor:pointer;
+    padding:0 0.25rem;
+    line-height:1;
+  }
+
+  .row-actions{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:0.5rem;
+  }
+
+  .add-set{
+    background:none;
+    border:1px dashed var(--border);
+    color:var(--text-dim);
+    border-radius:5px;
+    padding:0.35rem 0.7rem;
+    font-size:0.78rem;
+    cursor:pointer;
+  }
+
+  .tally{ display:flex; align-items:center; gap:8px; }
+
+  .tally-group{ position:relative; display:flex; gap:3px; }
+
+  .tally-line{ width:2px; height:14px; background:var(--text-dim); }
+
+  .tally-slash{
+    position:absolute;
+    width:20px;
+    height:2px;
+    background:var(--accent);
+    top:6px;
+    left:-2px;
+    transform:rotate(-50deg);
+  }
+
+  footer{
+    position:fixed;
+    bottom:0; left:0; right:0;
+    background:var(--surface);
+    border-top:1px solid var(--border);
+    padding:0.85rem 1.25rem;
+    display:flex;
+    gap:0.75rem;
+    justify-content:center;
+  }
+
+  .save-btn{
+    background:var(--accent);
+    color:var(--accent-text);
+    border:none;
+    font-family:'Oswald', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    font-size:0.9rem;
+    padding:0.75rem 1.5rem;
+    border-radius:6px;
+    cursor:pointer;
+    flex:1;
+    max-width:640px;
+  }
+
+  .save-msg{
+    text-align:center;
+    color:var(--brass);
+    font-size:0.85rem;
+    margin:0.5rem 0 0;
+    font-family:'JetBrains Mono', monospace;
+    min-height:1.2rem;
+  }
+
+  .history-entry{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:0.85rem 1rem;
+    margin-bottom:0.75rem;
+  }
+
+  .history-date{
+    font-family:'Oswald', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    font-size:0.95rem;
+    color:var(--accent);
+  }
+
+  .history-day{ color:var(--text-dim); font-size:0.8rem; margin-bottom:0.5rem; }
+
+  .history-ex{ font-size:0.85rem; margin:0.15rem 0; font-family:'JetBrains Mono', monospace; }
+
+  .empty{ color:var(--text-dim); text-align:center; padding:2rem 1rem; font-size:0.9rem; }
+
+  .clear-btn{
+    display:block;
+    margin:1.5rem auto 0;
+    background:none;
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    border-radius:6px;
+    padding:0.5rem 1rem;
+    font-size:0.8rem;
+    cursor:pointer;
+  }
+
+  .sync-bar{
+    display:flex;
+    align-items:center;
+    gap:0.6rem;
+    margin-top:0.75rem;
+    flex-wrap:wrap;
+  }
+
+  .sync-btn{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    border-radius:6px;
+    padding:0.4rem 0.8rem;
+    font-size:0.78rem;
+    cursor:pointer;
+  }
+
+  .sync-btn.connected{ border-color:var(--brass); color:var(--brass); }
+
+  .sync-status{
+    font-size:0.75rem;
+    color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Iron log</h1>
+  <p class="subtitle">Home gym strength &amp; glute-focus tracker — 5 day split</p>
+  <div class="sync-bar">
+    <button class="sync-btn" id="sync-btn" onclick="handleSyncClick()">Connect Google Drive</button>
+    <span class="sync-status" id="sync-status"></span>
+  </div>
+</header>
+
+<nav id="nav"></nav>
+
+<main id="main"></main>
+
+<footer id="footer"></footer>
+
+<script>
+const STORAGE_KEY = 'workout-log';
+
+const PROGRAM = {
+  1: { name: 'Lower body A', sub: 'Quad &amp; glute focus', exercises: [
+    { id:'gs',  name:'Goblet squat',           target:'4 x 8-12' },
+    { id:'rdl', name:'Romanian deadlift',      target:'3 x 10-12' },
+    { id:'bss', name:'Bulgarian split squat',  target:'3 x 10-12 / leg' },
+    { id:'wl',  name:'Walking lunge',          target:'3 x 12 / leg' },
+    { id:'hth', name:'Bench hip thrust',       target:'3 x 12-15' },
+    { id:'cr',  name:'Standing calf raise',    target:'3 x 15-20' }
+  ]},
+  2: { name: 'Upper push', sub: 'Chest, shoulders &amp; triceps', exercises: [
+    { id:'bp',  name:'EZ bar bench press',     target:'4 x 6-10' },
+    { id:'shp', name:'DB shoulder press',      target:'3 x 10-12' },
+    { id:'pu',  name:'Push-up (stands)',       target:'3 x AMRAP', bw:true },
+    { id:'fly', name:'DB flye',                target:'3 x 12-15' },
+    { id:'lat', name:'Lateral raise',          target:'3 x 12-15' },
+    { id:'sc',  name:'EZ bar skull crusher',   target:'3 x 10-12' }
+  ]},
+  3: { name: 'Lower body B', sub: 'Hamstring &amp; glute focus', exercises: [
+    { id:'dl',  name:'DB deadlift',            target:'4 x 8-10' },
+    { id:'kbs', name:'Kettlebell swing',       target:'3 x 15-20' },
+    { id:'su',  name:'Step-up (bench)',        target:'3 x 10-12 / leg' },
+    { id:'slr', name:'Single-leg RDL',         target:'3 x 10 / leg' },
+    { id:'ll',  name:'Lateral lunge',          target:'3 x 10-12 / leg' },
+    { id:'pl',  name:'Plank',                  target:'3 rounds', bw:true }
+  ]},
+  4: { name: 'Upper pull', sub: 'Back &amp; biceps', exercises: [
+    { id:'plu', name:'Pull-up',                target:'4 x AMRAP', bw:true },
+    { id:'row', name:'Single-arm DB row',      target:'3 x 10-12 / side' },
+    { id:'cur', name:'EZ bar curl',            target:'3 x 10-12' },
+    { id:'hc',  name:'Hammer curl',            target:'3 x 10-12' },
+    { id:'fp',  name:'Face pull / reverse flye', target:'3 x 15-20' }
+  ]},
+  5: { name: 'Full body & glutes', sub: 'Mixed accessory day', exercises: [
+    { id:'ht2', name:'Bench hip thrust',       target:'4 x 10-15' },
+    { id:'kb2', name:'Kettlebell swing',       target:'3 x 15-20' },
+    { id:'sumo',name:'KB goblet sumo squat',   target:'3 x 10-12' },
+    { id:'slc', name:'Single-leg calf raise',  target:'3 x 15 / leg' },
+    { id:'pu2', name:'Push-up',                target:'3 x AMRAP', bw:true },
+    { id:'fc',  name:'Farmer carry',           target:'3 rounds', bw:true }
+  ]}
+};
+
+let history = [];
+let currentDay = 1;
+let currentView = 'log';
+let rows = {};
+
+function resetRows(){
+  rows = {};
+  PROGRAM[currentDay].exercises.forEach(ex => {
+    rows[ex.id] = [{ weight:'', reps:'' }];
+  });
+}
+resetRows();
+
+const hasCloudStorage = typeof window.storage !== 'undefined' && window.storage !== null;
+
+const GOOGLE_CLIENT_ID = '248806454487-67325c1fla6vq9vom73k4823t5k0p9dc.apps.googleusercontent.com';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
+const DRIVE_FILE_NAME = 'iron-log-history.json';
+
+let accessToken = null;
+let tokenClient = null;
+let driveFileId = null;
+
+function loadGsiScript(){
+  return new Promise((resolve, reject) => {
+    if(window.google && window.google.accounts){ resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+async function ensureTokenClient(){
+  await loadGsiScript();
+  if(!tokenClient){
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: DRIVE_SCOPE,
+      callback: ''
+    });
+  }
+}
+
+function requestToken(prompt){
+  return new Promise((resolve, reject) => {
+    tokenClient.callback = (resp) => {
+      if(resp.error){ reject(resp); return; }
+      accessToken = resp.access_token;
+      resolve(resp);
+    };
+    tokenClient.requestAccessToken({ prompt });
+  });
+}
+
+function setSyncStatus(text){
+  const el = document.getElementById('sync-status');
+  if(el) el.textContent = text;
+  const btn = document.getElementById('sync-btn');
+  if(btn){
+    if(accessToken){
+      btn.textContent = 'Sync now';
+      btn.classList.add('connected');
+    }else{
+      btn.textContent = 'Connect Google Drive';
+      btn.classList.remove('connected');
+    }
+  }
+}
+
+async function getDriveFileId(){
+  if(driveFileId) return driveFileId;
+  const res = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&fields=files(id,name)&q=' + encodeURIComponent("name='"+DRIVE_FILE_NAME+"'"), {
+    headers: { Authorization: 'Bearer ' + accessToken }
+  });
+  const data = await res.json();
+  if(data.files && data.files.length){
+    driveFileId = data.files[0].id;
+  }
+  return driveFileId;
+}
+
+async function readDriveFile(){
+  const id = await getDriveFileId();
+  if(!id) return null;
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`, {
+    headers: { Authorization: 'Bearer ' + accessToken }
+  });
+  if(!res.ok) return null;
+  try{
+    return await res.json();
+  }catch(e){ return null; }
+}
+
+async function writeDriveFile(data){
+  const id = await getDriveFileId();
+  const body = JSON.stringify(data);
+  if(id){
+    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${id}?uploadType=media`, {
+      method:'PATCH',
+      headers:{ 'Authorization':'Bearer '+accessToken, 'Content-Type':'application/json' },
+      body
+    });
+  }else{
+    const metadata = { name: DRIVE_FILE_NAME, parents:['appDataFolder'] };
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(metadata)], {type:'application/json'}));
+    form.append('file', new Blob([body], {type:'application/json'}));
+    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
+      method:'POST',
+      headers:{ 'Authorization':'Bearer '+accessToken },
+      body: form
+    });
+    const result = await res.json();
+    driveFileId = result.id;
+  }
+}
+
+function mergeHistories(a, b){
+  const map = new Map();
+  [...a, ...b].forEach(sess => map.set(sess.date, sess));
+  return [...map.values()].sort((x,y) => new Date(x.date) - new Date(y.date));
+}
+
+async function syncWithDrive(){
+  setSyncStatus('Syncing...');
+  try{
+    const remote = await readDriveFile();
+    const merged = mergeHistories(history, remote || []);
+    history = merged;
+    await saveHistory();
+    await writeDriveFile(merged);
+    setSyncStatus('Synced just now');
+    render();
+  }catch(e){
+    console.error(e);
+    setSyncStatus('Sync failed — try again');
+  }
+}
+
+async function autoPushToDrive(){
+  if(!accessToken) return;
+  try{
+    const remote = await readDriveFile();
+    const merged = mergeHistories(history, remote || []);
+    history = merged;
+    await saveHistory();
+    await writeDriveFile(merged);
+    setSyncStatus('Synced just now');
+  }catch(e){
+    console.error(e);
+    setSyncStatus('Sync failed — will retry next save');
+  }
+}
+
+async function handleSyncClick(){
+  if(accessToken){
+    await syncWithDrive();
+    return;
+  }
+  setSyncStatus('Connecting...');
+  try{
+    await ensureTokenClient();
+    await requestToken('consent');
+    localStorage.setItem('gdrive-connected', '1');
+    await syncWithDrive();
+  }catch(e){
+    console.error(e);
+    setSyncStatus('Connection failed — try again');
+  }
+}
+
+async function loadHistory(){
+  if(hasCloudStorage){
+    try{
+      const res = await window.storage.get(STORAGE_KEY, false);
+      history = res && res.value ? JSON.parse(res.value) : [];
+      return;
+    }catch(e){
+      history = [];
+      return;
+    }
+  }
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    history = raw ? JSON.parse(raw) : [];
+  }catch(e){
+    history = [];
+  }
+}
+
+async function saveHistory(){
+  if(hasCloudStorage){
+    try{
+      await window.storage.set(STORAGE_KEY, JSON.stringify(history), false);
+      return;
+    }catch(e){
+      console.error('Could not save to cloud storage', e);
+      return;
+    }
+  }
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  }catch(e){
+    console.error('Could not save to local storage', e);
+  }
+}
+
+function e1rm(weight, reps){
+  return weight * (1 + reps/30);
+}
+
+function bestFor(exId){
+  let best = null;
+  history.forEach(sess => {
+    const sets = sess.exercises[exId];
+    if(!sets) return;
+    sets.forEach(s => {
+      const score = e1rm(s.weight, s.reps);
+      if(!best || score > best.score) best = { score, weight:s.weight, reps:s.reps };
+    });
+  });
+  return best;
+}
+
+function lastSessionFor(dayId, exId){
+  for(let i = history.length - 1; i >= 0; i--){
+    if(history[i].dayId === dayId && history[i].exercises[exId]){
+      return history[i].exercises[exId];
+    }
+  }
+  return null;
+}
+
+function renderTally(count){
+  let html = '';
+  let remaining = count;
+  while(remaining > 0){
+    const n = Math.min(remaining, 5);
+    html += '<div class="tally-group">';
+    for(let i=0;i<Math.min(n,4);i++) html += '<div class="tally-line"></div>';
+    if(n === 5) html += '<div class="tally-line"></div><div class="tally-slash"></div>';
+    html += '</div>';
+    remaining -= n;
+  }
+  return html;
+}
+
+function renderNav(){
+  const nav = document.getElementById('nav');
+  let html = '';
+  Object.keys(PROGRAM).forEach(d => {
+    html += `<button class="tab ${currentView==='log' && currentDay==d ? 'active':''}" onclick="selectDay(${d})">0${d} ${PROGRAM[d].name}</button>`;
+  });
+  html += `<button class="tab ${currentView==='history' ? 'active':''}" onclick="selectHistory()">History</button>`;
+  nav.innerHTML = html;
+}
+
+function selectDay(d){
+  currentDay = Number(d);
+  currentView = 'log';
+  resetRows();
+  render();
+}
+
+function selectHistory(){
+  currentView = 'history';
+  render();
+}
+
+function addSet(exId){
+  rows[exId].push({ weight:'', reps:'' });
+  render();
+}
+
+function removeSet(exId, idx){
+  if(rows[exId].length > 1) rows[exId].splice(idx,1);
+  render();
+}
+
+function updateField(exId, idx, field, value){
+  rows[exId][idx][field] = value;
+}
+
+function renderLog(){
+  const day = PROGRAM[currentDay];
+  let html = `<h2 class="day-head">0${currentDay} ${day.name}</h2>`;
+  html += `<p class="day-sub">${day.sub}</p>`;
+
+  day.exercises.forEach(ex => {
+    const last = lastSessionFor(currentDay, ex.id);
+    let lastText = 'No previous session logged';
+    if(last && last.length){
+      lastText = 'Last time: ' + last.map(s => ex.bw ? `${s.reps} reps${s.weight ? ' +'+s.weight+'lb':''}` : `${s.weight}lb x ${s.reps}`).join(', ');
+    }
+
+    html += `<div class="card">
+      <div class="ex-name-row">
+        <span class="ex-name">${ex.name}</span>
+        <span class="pr-badge" id="pr-${ex.id}">PR</span>
+        <span class="ex-target">${ex.target}</span>
+      </div>
+      <p class="last-time">${lastText}</p>`;
+
+    rows[ex.id].forEach((row,idx) => {
+      html += `<div class="set-row">
+        <span class="set-num">${idx+1}</span>
+        <input type="number" inputmode="decimal" placeholder="${ex.bw ? 'added wt' : 'weight'}" value="${row.weight}" step="2.5"
+          onchange="updateField('${ex.id}', ${idx}, 'weight', this.value)">
+        <span class="unit">lb</span>
+        <input type="number" inputmode="numeric" placeholder="reps" value="${row.reps}"
+          onchange="updateField('${ex.id}', ${idx}, 'reps', this.value)">
+        <span class="unit">reps</span>
+        <button class="remove-set" onclick="removeSet('${ex.id}', ${idx})" aria-label="Remove set">&times;</button>
+      </div>`;
+    });
+
+    html += `<div class="row-actions">
+        <button class="add-set" onclick="addSet('${ex.id}')">+ Add set</button>
+        <div class="tally">${renderTally(rows[ex.id].filter(r=>r.weight!=='' || r.reps!=='').length)}</div>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('footer').innerHTML = `
+    <button class="save-btn" onclick="saveWorkout()">Save workout</button>`;
+  const msgEl = document.createElement('p');
+  msgEl.className = 'save-msg';
+  msgEl.id = 'save-msg';
+  document.getElementById('main').appendChild(msgEl);
+}
+
+function renderHistory(){
+  let html = `<h2 class="day-head">History</h2>`;
+  if(history.length === 0){
+    html += `<p class="empty">No sessions logged yet. Log your first workout from the day tabs above.</p>`;
+  }else{
+    [...history].reverse().forEach(sess => {
+      const day = PROGRAM[sess.dayId];
+      html += `<div class="history-entry">
+        <div class="history-date">${new Date(sess.date).toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'})}</div>
+        <div class="history-day">0${sess.dayId} ${day.name}</div>`;
+      day.exercises.forEach(ex => {
+        const sets = sess.exercises[ex.id];
+        if(!sets || !sets.length) return;
+        const text = sets.map(s => ex.bw ? `${s.reps}${s.weight ? ' +'+s.weight+'lb':''}` : `${s.weight}x${s.reps}`).join(', ');
+        html += `<div class="history-ex">${ex.name}: ${text}</div>`;
+      });
+      html += `</div>`;
+    });
+    html += `<button class="clear-btn" onclick="clearHistory()">Clear all history</button>`;
+  }
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('footer').innerHTML = '';
+}
+
+async function clearHistory(){
+  if(!confirm('This will permanently delete all logged workouts. Continue?')) return;
+  history = [];
+  await saveHistory();
+  if(accessToken){
+    try{
+      await writeDriveFile([]);
+      setSyncStatus('Synced just now');
+    }catch(e){
+      console.error(e);
+      setSyncStatus('Sync failed — will retry next save');
+    }
+  }
+  render();
+}
+
+async function saveWorkout(){
+  const sessionExercises = {};
+  let anyLogged = false;
+  let prs = [];
+
+  PROGRAM[currentDay].exercises.forEach(ex => {
+    const sets = rows[ex.id]
+      .filter(r => r.weight !== '' || r.reps !== '')
+      .map(r => ({ weight: Number(r.weight)||0, reps: Number(r.reps)||0 }))
+      .filter(r => r.reps > 0);
+
+    if(sets.length){
+      anyLogged = true;
+      const priorBest = bestFor(ex.id);
+      const topThisSession = sets.reduce((a,b)=> e1rm(b.weight,b.reps) > e1rm(a.weight,a.reps) ? b : a);
+      if(!priorBest || e1rm(topThisSession.weight, topThisSession.reps) > priorBest.score){
+        prs.push(ex.id);
+      }
+      sessionExercises[ex.id] = sets;
+    }
+  });
+
+  if(!anyLogged){
+    document.getElementById('save-msg').textContent = 'Enter at least one set before saving.';
+    return;
+  }
+
+  history.push({
+    date: new Date().toISOString(),
+    dayId: currentDay,
+    exercises: sessionExercises
+  });
+
+  await saveHistory();
+
+  prs.forEach(exId => {
+    const badge = document.getElementById('pr-'+exId);
+    if(badge) badge.style.display = 'inline-block';
+  });
+
+  document.getElementById('save-msg').textContent =
+    prs.length ? `Workout saved — new PR on ${prs.length} exercise${prs.length>1?'s':''}!` : 'Workout saved.';
+
+  if(accessToken) await autoPushToDrive();
+}
+
+function render(){
+  renderNav();
+  if(currentView === 'history') renderHistory();
+  else renderLog();
+}
+
+(async function init(){
+  await loadHistory();
+  render();
+  setSyncStatus('');
+  if(localStorage.getItem('gdrive-connected') === '1'){
+    try{
+      await ensureTokenClient();
+      await requestToken('none');
+      await syncWithDrive();
+    }catch(e){
+      setSyncStatus('Tap to reconnect');
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
