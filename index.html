@@ -46,7 +46,22 @@
     color:var(--accent);
   }
 
-  .subtitle{ color:var(--text-dim); font-size:0.85rem; margin-top:0.25rem; }
+  .subtitle{ color:var(--text-dim); font-size:0.85rem; margin-top:0.25rem; cursor:pointer; }
+  .subtitle:hover{ color:var(--text); }
+
+  .header-edit-row{ display:flex; align-items:center; gap:0.5rem; }
+  .header-edit-btn{
+    background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:1rem;
+    padding:0.1rem 0.3rem; line-height:1; opacity:0.7;
+  }
+  .header-edit-btn:hover{ opacity:1; color:var(--brass); }
+
+  h1[contenteditable="true"], .subtitle[contenteditable="true"]{
+    outline:1px dashed var(--brass);
+    border-radius:4px;
+    padding:0.1rem 0.3rem;
+    cursor:text;
+  }
 
   .sync-bar{ display:flex; align-items:center; gap:0.6rem; margin-top:0.75rem; flex-wrap:wrap; }
 
@@ -117,6 +132,9 @@
     position:fixed; bottom:0; left:0; right:0; background:var(--surface); border-top:1px solid var(--border);
     padding:0.85rem 1.25rem; display:flex; gap:0.75rem; justify-content:center;
   }
+  footer:empty{
+    padding:0; border-top:none; pointer-events:none; min-height:0;
+  }
   .save-btn{
     background:var(--accent); color:var(--accent-text); border:none; font-family:'Oswald', sans-serif;
     text-transform:uppercase; letter-spacing:0.08em; font-size:0.9rem; padding:0.75rem 1.5rem;
@@ -133,6 +151,33 @@
   .history-date{ font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.05em; font-size:0.95rem; color:var(--accent); }
   .history-day{ color:var(--text-dim); font-size:0.8rem; margin-bottom:0.5rem; }
   .history-ex{ font-size:0.85rem; margin:0.15rem 0; font-family:'JetBrains Mono', monospace; }
+
+  .history-actions{ display:flex; gap:0.5rem; margin-top:0.6rem; }
+  .history-action-btn{
+    background:none; border:1px solid var(--border); color:var(--text-dim);
+    border-radius:5px; padding:0.3rem 0.65rem; font-size:0.72rem; cursor:pointer;
+  }
+  .history-action-btn:hover{ color:var(--text); }
+  .history-action-btn.danger:hover{ color:var(--accent); border-color:var(--accent); }
+
+  .history-edit-row{ display:flex; align-items:center; gap:0.5rem; margin:0.3rem 0; }
+  .history-edit-ex-name{ font-size:0.82rem; font-family:'JetBrains Mono', monospace; flex:0 0 auto; min-width:90px; }
+  .history-edit-row input{
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text); border-radius:5px;
+    padding:0.35rem 0.5rem; font-family:'JetBrains Mono', monospace; font-size:0.82rem; width:65px; text-align:center;
+  }
+  .history-edit-unit{ color:var(--text-dim); font-size:0.72rem; }
+  .history-edit-setnum{ color:var(--text-dim); font-size:0.72rem; width:1.2rem; }
+  .history-edit-actions{ display:flex; gap:0.5rem; margin-top:0.75rem; }
+  .history-save-btn{
+    background:var(--accent); color:var(--accent-text); border:none; border-radius:5px;
+    padding:0.4rem 0.9rem; font-size:0.78rem; cursor:pointer; font-family:'Oswald', sans-serif;
+    text-transform:uppercase; letter-spacing:0.04em;
+  }
+  .history-cancel-btn{
+    background:none; color:var(--text-dim); border:1px solid var(--border); border-radius:5px;
+    padding:0.4rem 0.9rem; font-size:0.78rem; cursor:pointer;
+  }
 
   .empty{ color:var(--text-dim); text-align:center; padding:2rem 1rem; font-size:0.9rem; }
 
@@ -185,16 +230,126 @@
     width:100%; background:none; border:1px dashed var(--border); color:var(--text-dim);
     border-radius:6px; padding:0.6rem; font-size:0.82rem; cursor:pointer; margin-top:0.4rem;
   }
+
+  .unit-toggle{
+    display:flex; border:1px solid var(--border); border-radius:6px; overflow:hidden;
+    margin-left:auto;
+  }
+  .unit-opt{
+    background:none; border:none; color:var(--text-dim); font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem; padding:0.4rem 0.7rem; cursor:pointer;
+  }
+  .unit-opt.active{ background:var(--brass); color:var(--brass-text); }
+
+  /* --- Wizard --- */
+  .wizard-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:1.5rem 1.25rem; margin-bottom:1rem;
+  }
+  .wizard-progress{
+    display:flex; gap:0.4rem; margin-bottom:1.25rem;
+  }
+  .wizard-progress-seg{
+    flex:1; height:4px; border-radius:2px; background:var(--surface-2);
+  }
+  .wizard-progress-seg.done{ background:var(--brass); }
+  .wizard-progress-seg.current{ background:var(--accent); }
+
+  .wizard-q{
+    font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.04em;
+    font-size:1.05rem; margin:0 0 0.3rem;
+  }
+  .wizard-hint{ color:var(--text-dim); font-size:0.82rem; margin:0 0 1.1rem; }
+
+  .wizard-options{ display:flex; flex-direction:column; gap:0.6rem; }
+  .wizard-opt{
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    border-radius:8px; padding:0.75rem 1rem; font-size:0.92rem; text-align:left; cursor:pointer;
+  }
+  .wizard-opt.selected{ border-color:var(--accent); background:rgba(193,89,47,0.15); }
+  .wizard-opt-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; }
+
+  .wizard-nav{ display:flex; justify-content:space-between; margin-top:1.5rem; gap:0.75rem; }
+  .wizard-back{
+    background:none; border:1px solid var(--border); color:var(--text-dim);
+    border-radius:6px; padding:0.65rem 1.1rem; font-size:0.85rem; cursor:pointer;
+  }
+  .wizard-next{
+    background:var(--accent); color:var(--accent-text); border:none;
+    border-radius:6px; padding:0.65rem 1.4rem; font-size:0.85rem; cursor:pointer;
+    font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.05em;
+  }
+  .wizard-next:disabled{ opacity:0.4; cursor:not-allowed; }
+  .wizard-skip{
+    display:block; margin:0.85rem auto 0; background:none; border:none; color:var(--text-dim);
+    font-size:0.78rem; text-decoration:underline; cursor:pointer;
+  }
+
+  .wizard-preview-day{
+    background:var(--surface-2); border:1px solid var(--border); border-radius:8px;
+    padding:0.75rem 0.9rem; margin-bottom:0.6rem;
+  }
+  .wizard-preview-day-name{ font-family:'Oswald', sans-serif; text-transform:uppercase; font-size:0.85rem; letter-spacing:0.04em; color:var(--brass); margin-bottom:0.4rem; }
+  .wizard-preview-ex{ font-size:0.82rem; color:var(--text-dim); margin:0.15rem 0; }
+
+  .personalize-tab{ color:var(--brass); }
+
+  /* --- Loading screen --- */
+  .loading-screen{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:3.5rem 1.5rem; text-align:center; min-height:50vh;
+  }
+  .loading-spinner{
+    width:54px; height:54px; border-radius:50%;
+    border:4px solid var(--surface-2); border-top-color:var(--accent);
+    animation:spin 0.9s linear infinite; margin-bottom:1.75rem;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .loading-text{
+    font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.04em;
+    font-size:1.05rem; color:var(--brass); min-height:2.6em; max-width:380px;
+    transition:opacity 0.3s ease;
+  }
+  .loading-text.fading{ opacity:0; }
+  .loading-sub{ color:var(--text-dim); font-size:0.8rem; margin-top:1.25rem; font-family:'JetBrains Mono', monospace; }
+
+  .week-summary{
+    display:flex; align-items:center; justify-content:space-between; gap:0.75rem;
+    background:var(--surface); border:1px solid var(--border); border-radius:8px;
+    padding:0.75rem 1rem; margin-bottom:1.25rem;
+  }
+  .week-summary-text{ font-size:0.85rem; color:var(--text-dim); }
+  .week-summary-count{ color:var(--brass); font-family:'JetBrains Mono', monospace; font-weight:600; }
+  .week-dots{ display:flex; gap:0.4rem; }
+  .week-dot{
+    width:10px; height:10px; border-radius:50%; background:var(--surface-2);
+    border:1px solid var(--border); display:inline-block;
+  }
+  .week-dot.done{ background:var(--brass); border-color:var(--brass); }
+
+  .suggestion{
+    font-size:0.78rem; margin:0 0 0.6rem; padding:0.4rem 0.6rem; border-radius:5px;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .suggestion-add-weight{ background:rgba(212,162,78,0.12); color:var(--brass); }
+  .suggestion-stall{ background:rgba(193,89,47,0.12); color:var(--accent); }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Iron log</h1>
-  <p class="subtitle">Your program, your edits, tracked every session</p>
+  <div class="header-edit-row">
+    <h1 id="app-title" onclick="startHeaderEdit('title')">Iron log</h1>
+    <!-- This is a comment <button class="header-edit-btn" id="header-edit-btn" onclick="startHeaderEdit('title')" aria-label="Edit header">&#9998;</button>   !! -->
+  </div>
+  <p class="subtitle" id="app-subtitle" onclick="startHeaderEdit('subtitle')">Your program, your edits, tracked every session</p>
   <div class="sync-bar">
     <button class="sync-btn" id="sync-btn" onclick="handleSyncClick()">Connect Google Drive</button>
     <span class="sync-status" id="sync-status"></span>
+    <div class="unit-toggle" id="unit-toggle">
+      <button class="unit-opt" id="unit-opt-lb" onclick="setWeightUnit('lb')">lb</button>
+      <button class="unit-opt" id="unit-opt-kg" onclick="setWeightUnit('kg')">kg</button>
+    </div>
   </div>
 </header>
 
@@ -207,6 +362,9 @@
 <script>
 const STORAGE_HISTORY_KEY = 'workout-log';
 const STORAGE_PROGRAM_KEY = 'workout-program';
+const STORAGE_HEADER_KEY = 'workout-header';
+
+const DEFAULT_HEADER = { title: 'Iron log', subtitle: 'Your program, your edits, tracked every session' };
 
 const DEFAULT_PROGRAM = [
   { id:'d1', name:'Lower body A', sub:'Quad & glute focus', exercises:[
@@ -250,15 +408,243 @@ const DEFAULT_PROGRAM = [
   ]}
 ];
 
+/* ---------- Personalization engine ---------- */
+
+const EXERCISE_DB = [
+  { name:'Goblet squat', equipment:['dumbbell','kettlebell'], muscle:'legs', pattern:'squat', bw:false, target:'4 x 8-12', goalFit:['strength','hypertrophy','general','fatloss'] },
+  { name:'Barbell back squat', equipment:['barbell','rack'], muscle:'legs', pattern:'squat', bw:false, target:'4 x 6-10', goalFit:['strength','hypertrophy'] },
+  { name:'Bodyweight squat', equipment:[], muscle:'legs', pattern:'squat', bw:true, target:'3 x 15-20', goalFit:['general','fatloss','endurance'] },
+  { name:'Bulgarian split squat', equipment:['dumbbell','bench'], muscle:'legs', pattern:'squat', bw:false, target:'3 x 10-12 / leg', goalFit:['strength','hypertrophy','general'] },
+  { name:'Walking lunge', equipment:['dumbbell'], muscle:'legs', pattern:'lunge', bw:false, target:'3 x 12 / leg', goalFit:['hypertrophy','general','fatloss'] },
+  { name:'Bodyweight lunge', equipment:[], muscle:'legs', pattern:'lunge', bw:true, target:'3 x 15 / leg', goalFit:['general','fatloss','endurance'] },
+  { name:'Romanian deadlift (DB)', equipment:['dumbbell'], muscle:'legs', pattern:'hinge', bw:false, target:'3 x 10-12', goalFit:['strength','hypertrophy','general'] },
+  { name:'Barbell deadlift', equipment:['barbell'], muscle:'legs', pattern:'hinge', bw:false, target:'4 x 5-8', goalFit:['strength','hypertrophy'] },
+  { name:'Kettlebell swing', equipment:['kettlebell'], muscle:'legs', pattern:'hinge', bw:false, target:'3 x 15-20', goalFit:['fatloss','general','endurance'] },
+  { name:'Single-leg RDL', equipment:['dumbbell'], muscle:'legs', pattern:'hinge', bw:false, target:'3 x 10 / leg', goalFit:['strength','hypertrophy','general'] },
+  { name:'Step-up', equipment:['dumbbell','bench'], muscle:'legs', pattern:'squat', bw:false, target:'3 x 10-12 / leg', goalFit:['hypertrophy','general','fatloss'] },
+  { name:'Bench hip thrust', equipment:['dumbbell','bench'], muscle:'glutes', pattern:'hinge', bw:false, target:'3 x 12-15', goalFit:['strength','hypertrophy','general'] },
+  { name:'Glute bridge', equipment:[], muscle:'glutes', pattern:'hinge', bw:true, target:'3 x 15-20', goalFit:['general','fatloss'] },
+  { name:'Lateral lunge', equipment:['dumbbell'], muscle:'legs', pattern:'lunge', bw:false, target:'3 x 10-12 / leg', goalFit:['hypertrophy','general'] },
+  { name:'Standing calf raise', equipment:['dumbbell'], muscle:'calves', pattern:'isolation', bw:false, target:'3 x 15-20', goalFit:['hypertrophy','general'] },
+  { name:'Single-leg calf raise', equipment:[], muscle:'calves', pattern:'isolation', bw:true, target:'3 x 15 / leg', goalFit:['general','fatloss'] },
+  { name:'Leg press', equipment:['machine'], muscle:'legs', pattern:'squat', bw:false, target:'4 x 10-12', goalFit:['strength','hypertrophy'] },
+  { name:'Hip abduction (band)', equipment:['band'], muscle:'glutes', pattern:'isolation', bw:false, target:'3 x 15-20', goalFit:['general','hypertrophy'] },
+
+  { name:'Barbell bench press', equipment:['barbell','bench'], muscle:'chest', pattern:'push', bw:false, target:'4 x 6-10', goalFit:['strength','hypertrophy'] },
+  { name:'EZ bar bench press', equipment:['ez-bar','bench'], muscle:'chest', pattern:'push', bw:false, target:'4 x 6-10', goalFit:['strength','hypertrophy'] },
+  { name:'DB bench press', equipment:['dumbbell','bench'], muscle:'chest', pattern:'push', bw:false, target:'4 x 8-12', goalFit:['strength','hypertrophy','general'] },
+  { name:'Push-up', equipment:[], muscle:'chest', pattern:'push', bw:true, target:'3 x AMRAP', goalFit:['general','fatloss','endurance'] },
+  { name:'Push-up (deficit/stands)', equipment:['push-up-stands'], muscle:'chest', pattern:'push', bw:true, target:'3 x AMRAP', goalFit:['hypertrophy','general'] },
+  { name:'DB shoulder press', equipment:['dumbbell'], muscle:'shoulders', pattern:'push', bw:false, target:'3 x 10-12', goalFit:['strength','hypertrophy','general'] },
+  { name:'Pike push-up', equipment:[], muscle:'shoulders', pattern:'push', bw:true, target:'3 x 10-15', goalFit:['general','fatloss'] },
+  { name:'DB flye', equipment:['dumbbell','bench'], muscle:'chest', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'] },
+  { name:'Lateral raise', equipment:['dumbbell'], muscle:'shoulders', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','general'] },
+  { name:'EZ bar skull crusher', equipment:['ez-bar','bench'], muscle:'triceps', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','strength'] },
+  { name:'Triceps dip', equipment:['bench'], muscle:'triceps', pattern:'push', bw:true, target:'3 x 10-15', goalFit:['general','hypertrophy'] },
+  { name:'Overhead triceps extension', equipment:['dumbbell'], muscle:'triceps', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'] },
+
+  { name:'Pull-up', equipment:['pull-up-bar'], muscle:'back', pattern:'pull', bw:true, target:'4 x AMRAP', goalFit:['strength','hypertrophy','general'] },
+  { name:'Chin-up', equipment:['pull-up-bar'], muscle:'back', pattern:'pull', bw:true, target:'4 x AMRAP', goalFit:['strength','hypertrophy'] },
+  { name:'Single-arm DB row', equipment:['dumbbell','bench'], muscle:'back', pattern:'pull', bw:false, target:'3 x 10-12 / side', goalFit:['strength','hypertrophy','general'] },
+  { name:'Barbell row', equipment:['barbell'], muscle:'back', pattern:'pull', bw:false, target:'4 x 8-10', goalFit:['strength','hypertrophy'] },
+  { name:'Inverted row', equipment:['pull-up-bar'], muscle:'back', pattern:'pull', bw:true, target:'3 x 10-15', goalFit:['general','fatloss'] },
+  { name:'EZ bar curl', equipment:['ez-bar'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','strength'] },
+  { name:'DB curl', equipment:['dumbbell'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','general'] },
+  { name:'Hammer curl', equipment:['dumbbell'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy'] },
+  { name:'Face pull / reverse flye', equipment:['band'], muscle:'shoulders', pattern:'pull', bw:false, target:'3 x 15-20', goalFit:['general','hypertrophy'] },
+
+  { name:'Plank', equipment:[], muscle:'core', pattern:'core', bw:true, target:'3 rounds', goalFit:['general','fatloss','endurance'] },
+  { name:'Farmer carry', equipment:['dumbbell'], muscle:'core', pattern:'carry', bw:true, target:'3 rounds', goalFit:['strength','general','fatloss'] },
+  { name:'Mountain climbers', equipment:[], muscle:'core', pattern:'core', bw:true, target:'3 x 20', goalFit:['fatloss','endurance'] },
+  { name:'KB goblet sumo squat', equipment:['kettlebell'], muscle:'legs', pattern:'squat', bw:false, target:'3 x 10-12', goalFit:['general','hypertrophy'] },
+  { name:'Burpees', equipment:[], muscle:'core', pattern:'conditioning', bw:true, target:'3 x 12-15', goalFit:['fatloss','endurance'] },
+  { name:'Jump rope', equipment:['jump-rope'], muscle:'core', pattern:'conditioning', bw:true, target:'5 x 1 min', goalFit:['fatloss','endurance'] },
+];
+
+const SPLIT_TEMPLATES = {
+  2: [
+    { name:'Full body A', muscles:['legs','chest','back','core'] },
+    { name:'Full body B', muscles:['legs','shoulders','back','glutes'] },
+  ],
+  3: [
+    { name:'Full body A', muscles:['legs','chest','back'] },
+    { name:'Full body B', muscles:['legs','shoulders','back','core'] },
+    { name:'Full body C', muscles:['glutes','chest','biceps','triceps'] },
+  ],
+  4: [
+    { name:'Lower body A', muscles:['legs','glutes','calves'] },
+    { name:'Upper push', muscles:['chest','shoulders','triceps'] },
+    { name:'Lower body B', muscles:['legs','glutes','core'] },
+    { name:'Upper pull', muscles:['back','biceps','shoulders'] },
+  ],
+  5: [
+    { name:'Lower body A', muscles:['legs','glutes','calves'] },
+    { name:'Upper push', muscles:['chest','shoulders','triceps'] },
+    { name:'Lower body B', muscles:['legs','glutes','core'] },
+    { name:'Upper pull', muscles:['back','biceps','shoulders'] },
+    { name:'Full body & focus', muscles:['glutes','core','legs'] },
+  ],
+  6: [
+    { name:'Push A', muscles:['chest','shoulders','triceps'] },
+    { name:'Pull A', muscles:['back','biceps'] },
+    { name:'Legs A', muscles:['legs','glutes','calves'] },
+    { name:'Push B', muscles:['chest','shoulders','triceps'] },
+    { name:'Pull B', muscles:['back','biceps'] },
+    { name:'Legs B', muscles:['legs','glutes','core'] },
+  ],
+};
+
+function exerciseFitsEquipment(ex, available){
+  if(ex.equipment.length === 0) return true;
+  return ex.equipment.every(eq => available.includes(eq));
+}
+
+function pickExercisesForDay(muscles, equipment, goal, focusMuscle, usedNamesByMuscle, perMuscleCount){
+  const picks = [];
+  muscles.forEach(muscle => {
+    const usedForThisMuscle = usedNamesByMuscle.get(muscle) || new Set();
+    let candidates = EXERCISE_DB.filter(ex =>
+      ex.muscle === muscle &&
+      exerciseFitsEquipment(ex, equipment) &&
+      ex.goalFit.includes(goal) &&
+      !usedForThisMuscle.has(ex.name)
+    );
+    if(candidates.length === 0){
+      candidates = EXERCISE_DB.filter(ex =>
+        ex.muscle === muscle &&
+        exerciseFitsEquipment(ex, equipment) &&
+        ex.goalFit.includes(goal)
+      );
+    }
+    const patternPriority = { squat:0, hinge:0, push:0, pull:0, lunge:1, carry:1, isolation:2, core:2, conditioning:2 };
+    candidates.sort((a,b) => (patternPriority[a.pattern]??3) - (patternPriority[b.pattern]??3));
+
+    const count = (focusMuscle && muscle === focusMuscle) ? perMuscleCount + 1 : perMuscleCount;
+    candidates.slice(0, count).forEach(ex => {
+      picks.push(ex);
+      usedForThisMuscle.add(ex.name);
+    });
+    usedNamesByMuscle.set(muscle, usedForThisMuscle);
+  });
+  return picks;
+}
+
+function generatePersonalizedProgram({ daysPerWeek, goal, equipment, focusMuscle, experience }){
+  const template = SPLIT_TEMPLATES[daysPerWeek] || SPLIT_TEMPLATES[4];
+  const perMuscleCount = experience === 'beginner' ? 1 : 2;
+  const usedNamesByMuscle = new Map();
+
+  return template.map((day, idx) => {
+    const exercises = pickExercisesForDay(day.muscles, equipment, goal, focusMuscle, usedNamesByMuscle, perMuscleCount);
+    return {
+      id: uid('d'),
+      name: day.name,
+      sub: day.muscles.join(', '),
+      exercises: exercises.map(ex => ({
+        id: uid('ex'),
+        name: ex.name,
+        target: ex.target,
+        bw: ex.bw
+      }))
+    };
+  });
+}
+
 let program = [];
 let history = [];
+let appHeader = { ...DEFAULT_HEADER };
+let weightUnit = 'lb';
 let currentDayId = null;
+
+function lbToKg(lb){ return lb / 2.20462; }
+function kgToLb(kg){ return kg * 2.20462; }
+
+function toDisplayWeight(lbValue){
+  if(lbValue === '' || lbValue === null || lbValue === undefined) return '';
+  const n = Number(lbValue);
+  if(isNaN(n)) return '';
+  const converted = weightUnit === 'kg' ? lbToKg(n) : n;
+  return Math.round(converted * 10) / 10;
+}
+
+function fromDisplayWeight(displayValue){
+  if(displayValue === '' || displayValue === null || displayValue === undefined) return '';
+  const n = Number(displayValue);
+  if(isNaN(n)) return '';
+  const lb = weightUnit === 'kg' ? kgToLb(n) : n;
+  return Math.round(lb * 10) / 10;
+}
+
+function loadWeightUnit(){
+  try{
+    const saved = localStorage.getItem('weight-unit');
+    if(saved === 'kg' || saved === 'lb') weightUnit = saved;
+  }catch(e){}
+}
+
+function renderUnitToggle(){
+  const lbBtn = document.getElementById('unit-opt-lb');
+  const kgBtn = document.getElementById('unit-opt-kg');
+  if(lbBtn) lbBtn.classList.toggle('active', weightUnit === 'lb');
+  if(kgBtn) kgBtn.classList.toggle('active', weightUnit === 'kg');
+}
+
+function setWeightUnit(unit){
+  weightUnit = unit;
+  try{ localStorage.setItem('weight-unit', unit); }catch(e){}
+  renderUnitToggle();
+  render();
+}
 let currentView = 'log';
 let rows = {};
 let editingProgram = [];
 let dragState = null;
 
 function uid(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
+
+function renderHeader(){
+  const titleEl = document.getElementById('app-title');
+  const subEl = document.getElementById('app-subtitle');
+  if(titleEl) titleEl.textContent = appHeader.title || DEFAULT_HEADER.title;
+  if(subEl) subEl.textContent = appHeader.subtitle || '';
+}
+
+function startHeaderEdit(which){
+  const el = document.getElementById(which === 'title' ? 'app-title' : 'app-subtitle');
+  if(!el || el.getAttribute('contenteditable') === 'true') return;
+
+  el.setAttribute('contenteditable', 'true');
+  el.focus();
+  document.execCommand('selectAll', false, null);
+
+  const finish = async (commit) => {
+    el.removeEventListener('blur', onBlur);
+    el.removeEventListener('keydown', onKeydown);
+    el.setAttribute('contenteditable', 'false');
+    if(commit){
+      const newText = el.textContent.trim();
+      if(which === 'title'){
+        appHeader.title = newText || DEFAULT_HEADER.title;
+      }else{
+        appHeader.subtitle = newText;
+      }
+      renderHeader();
+      await saveHeader();
+      if(accessToken) await autoPushToDrive();
+    }else{
+      renderHeader();
+    }
+  };
+
+  function onBlur(){ finish(true); }
+  function onKeydown(e){
+    if(e.key === 'Enter'){ e.preventDefault(); el.blur(); }
+    if(e.key === 'Escape'){ e.preventDefault(); finish(false); }
+  }
+
+  el.addEventListener('blur', onBlur);
+  el.addEventListener('keydown', onKeydown);
+}
 
 function resetRows(){
   rows = {};
@@ -273,6 +659,7 @@ const GOOGLE_CLIENT_ID = '248806454487-67325c1fla6vq9vom73k4823t5k0p9dc.apps.goo
 const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
 const DRIVE_HISTORY_FILE = 'iron-log-history.json';
 const DRIVE_PROGRAM_FILE = 'iron-log-program.json';
+const DRIVE_HEADER_FILE = 'iron-log-header.json';
 
 let accessToken = null;
 let tokenClient = null;
@@ -365,7 +752,7 @@ async function writeDriveFile(filename, data){
 
 function mergeHistories(a, b){
   const map = new Map();
-  [...a, ...b].forEach(sess => map.set(sess.date, sess));
+  [...a, ...b].forEach(sess => map.set(sess.id || sess.date, sess));
   return [...map.values()].sort((x,y) => new Date(x.date) - new Date(y.date));
 }
 
@@ -384,9 +771,19 @@ async function syncWithDrive(){
     }else{
       await writeDriveFile(DRIVE_PROGRAM_FILE, program);
     }
+
+    const remoteHeader = await readDriveFile(DRIVE_HEADER_FILE);
+    if(remoteHeader && remoteHeader.title && (!localStorage.getItem('program-edited-since-sync'))){
+      appHeader = remoteHeader;
+      await saveHeader();
+    }else{
+      await writeDriveFile(DRIVE_HEADER_FILE, appHeader);
+    }
+
     localStorage.removeItem('program-edited-since-sync');
 
     setSyncStatus('Synced just now');
+    renderHeader();
     render();
   }catch(e){
     console.error(e);
@@ -402,6 +799,7 @@ async function autoPushToDrive(){
     await saveHistory();
     await writeDriveFile(DRIVE_HISTORY_FILE, history);
     await writeDriveFile(DRIVE_PROGRAM_FILE, program);
+    await writeDriveFile(DRIVE_HEADER_FILE, appHeader);
     setSyncStatus('Synced just now');
   }catch(e){
     console.error(e);
@@ -472,25 +870,118 @@ async function saveProgram(){
   catch(e){ console.error('Could not save program to local storage', e); }
 }
 
+async function loadHeader(){
+  let loaded = null;
+  if(hasCloudStorage){
+    try{
+      const res = await window.storage.get(STORAGE_HEADER_KEY, false);
+      loaded = res && res.value ? JSON.parse(res.value) : null;
+    }catch(e){ loaded = null; }
+  }else{
+    try{
+      const raw = localStorage.getItem(STORAGE_HEADER_KEY);
+      loaded = raw ? JSON.parse(raw) : null;
+    }catch(e){ loaded = null; }
+  }
+  appHeader = (loaded && loaded.title) ? loaded : { ...DEFAULT_HEADER };
+}
+
+async function saveHeader(){
+  localStorage.setItem('program-edited-since-sync', '1');
+  if(hasCloudStorage){
+    try{ await window.storage.set(STORAGE_HEADER_KEY, JSON.stringify(appHeader), false); return; }
+    catch(e){ console.error('Could not save header to cloud storage', e); return; }
+  }
+  try{ localStorage.setItem(STORAGE_HEADER_KEY, JSON.stringify(appHeader)); }
+  catch(e){ console.error('Could not save header to local storage', e); }
+}
+
 function e1rm(weight, reps){ return weight * (1 + reps/30); }
 
-function bestFor(exId){
+function canonicalize(name){
+  return String(name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function progressScore(ex, weight, reps){
+  // For bodyweight moves with no added load, e1RM collapses to 0 regardless of reps,
+  // so reps themselves are the right progress signal. Once weight is added (e.g. weighted pull-ups), e1RM works normally.
+  if(ex.bw && weight === 0) return reps;
+  return e1rm(weight, reps);
+}
+
+function bestFor(ex){
+  const canonical = canonicalize(ex.name);
   let best = null;
   history.forEach(sess => {
-    const sets = sess.exercises[exId];
+    // Prefer the new canonical-name keyed format; fall back to legacy exId-keyed records.
+    let sets = sess.exercises[canonical];
+    if(!sets && ex.id) sets = sess.exercises[ex.id];
     if(!sets) return;
     sets.forEach(s => {
-      const score = e1rm(s.weight, s.reps);
+      const score = progressScore(ex, s.weight, s.reps);
       if(!best || score > best.score) best = { score, weight:s.weight, reps:s.reps };
     });
   });
   return best;
 }
 
-function lastSessionFor(dayId, exId){
+function lastSessionFor(dayId, ex){
+  const canonical = canonicalize(ex.name);
   for(let i = history.length - 1; i >= 0; i--){
-    if(history[i].dayId === dayId && history[i].exercises[exId]) return history[i].exercises[exId];
+    const sess = history[i];
+    if(sess.exercises[canonical]) return sess.exercises[canonical];
+    if(sess.dayId === dayId && ex.id && sess.exercises[ex.id]) return sess.exercises[ex.id];
   }
+  return null;
+}
+
+function getSessionHistoryFor(ex){
+  const canonical = canonicalize(ex.name);
+  const results = [];
+  history.forEach(sess => {
+    let sets = sess.exercises[canonical];
+    if(!sets && ex.id) sets = sess.exercises[ex.id];
+    if(!sets || !sets.length) return;
+    const topSet = sets.reduce((a,b) => progressScore(ex,b.weight,b.reps) > progressScore(ex,a.weight,a.reps) ? b : a);
+    const maxReps = Math.max(...sets.map(s => s.reps));
+    results.push({ date: sess.date, score: progressScore(ex, topSet.weight, topSet.reps), topSet, maxReps });
+  });
+  // history array is already chronological (oldest first); keep that order
+  return results;
+}
+
+function parseTargetRepCeiling(target){
+  // Looks for patterns like "3 x 10-12" or "4 x 8-12 / leg" and returns the top of the range, or null if not parseable (e.g. AMRAP, "3 rounds").
+  const match = String(target).match(/x\s*\d+\s*-\s*(\d+)/i);
+  if(!match) return null;
+  return Number(match[1]);
+}
+
+function getProgressionSuggestion(ex){
+  const sessions = getSessionHistoryFor(ex);
+  if(sessions.length < 2) return null;
+
+  const recent = sessions.slice(-3);
+  const repCeiling = parseTargetRepCeiling(ex.target);
+
+  // Rep-ceiling check: last 2+ sessions all hit the top of the target rep range.
+  if(repCeiling && recent.length >= 2){
+    const lastTwo = sessions.slice(-2);
+    const bothAtCeiling = lastTwo.every(s => s.maxReps >= repCeiling);
+    if(bothAtCeiling){
+      return { type:'add-weight', text:'Hit the top of your rep range twice in a row — try adding weight next session.' };
+    }
+  }
+
+  // Stall check: last 3 sessions show no improvement in estimated 1RM.
+  if(recent.length >= 3){
+    const scores = recent.map(s => s.score);
+    const noImprovement = scores.every((s, idx) => idx === 0 || s <= scores[idx-1] * 1.01);
+    if(noImprovement){
+      return { type:'stall', text:"No progress in 3 straight sessions — consider a lighter deload session or swapping rep tempo." };
+    }
+  }
+
   return null;
 }
 
@@ -514,11 +1005,14 @@ function escapeHtml(s){
 
 function renderNav(){
   const nav = document.getElementById('nav');
+  const completedSet = getThisWeekCompletedDayIds();
   let html = '';
   program.forEach(d => {
-    html += `<button class="tab ${currentView==='log' && currentDayId===d.id ? 'active':''}" onclick="selectDay('${d.id}')">${escapeHtml(d.name)}</button>`;
+    const done = isDayCompletedThisWeek(d, completedSet);
+    html += `<button class="tab ${currentView==='log' && currentDayId===d.id ? 'active':''}" onclick="selectDay('${d.id}')">${done ? '&#10003; ':''}${escapeHtml(d.name)}</button>`;
   });
   html += `<button class="tab ${currentView==='history' ? 'active':''}" onclick="selectHistory()">History</button>`;
+  html += `<button class="tab personalize-tab ${(currentView==='wizard'||currentView==='wizard-resolve') ? 'active':''}" onclick="startWizard()">Personalize</button>`;
   html += `<button class="tab edit-tab ${currentView==='edit' ? 'active':''}" onclick="selectEdit()">Edit program</button>`;
   nav.innerHTML = html;
 }
@@ -540,7 +1034,55 @@ function selectEdit(){
 
 function addSet(exId){ rows[exId].push({ weight:'', reps:'' }); render(); }
 function removeSet(exId, idx){ if(rows[exId].length > 1) rows[exId].splice(idx,1); render(); }
-function updateField(exId, idx, field, value){ rows[exId][idx][field] = value; }
+function updateField(exId, idx, field, value){
+  if(field === 'weight'){
+    rows[exId][idx][field] = fromDisplayWeight(value);
+  }else{
+    rows[exId][idx][field] = value;
+  }
+}
+
+function getThisWeekCompletedDayIds(){
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0 = Sunday
+  const diffToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
+  const monday = new Date(now);
+  monday.setHours(0,0,0,0);
+  monday.setDate(now.getDate() - diffToMonday);
+
+  const completed = new Set();
+  history.forEach(sess => {
+    const sessDate = new Date(sess.date);
+    if(sessDate >= monday){
+      completed.add(sess.dayId);
+      if(sess.dayName) completed.add('name:' + sess.dayName);
+    }
+  });
+  return completed;
+}
+
+function isDayCompletedThisWeek(day, completedSet){
+  return completedSet.has(day.id) || completedSet.has('name:' + day.name);
+}
+
+function renderWeeklySummary(){
+  const completedSet = getThisWeekCompletedDayIds();
+  const completedCount = program.filter(d => isDayCompletedThisWeek(d, completedSet)).length;
+  const totalDays = program.length;
+
+  let dotsHtml = '';
+  program.forEach(d => {
+    const done = isDayCompletedThisWeek(d, completedSet);
+    dotsHtml += `<span class="week-dot ${done ? 'done':''}" title="${escapeHtml(d.name)}"></span>`;
+  });
+
+  return `<div class="week-summary">
+    <div class="week-summary-text">
+      <span class="week-summary-count">${completedCount} / ${totalDays}</span> days done this week
+    </div>
+    <div class="week-dots">${dotsHtml}</div>
+  </div>`;
+}
 
 function renderLog(){
   const day = program.find(d => d.id === currentDayId);
@@ -557,16 +1099,23 @@ function renderLog(){
       <button class="edit-link" onclick="selectEdit()">Edit</button>
     </div>`;
 
+  html += renderWeeklySummary();
+
   if(!day.exercises.length){
     html += `<p class="empty">No exercises on this day yet. Tap "Edit program" to add some.</p>`;
   }
 
   day.exercises.forEach(ex => {
-    const last = lastSessionFor(currentDayId, ex.id);
+    const last = lastSessionFor(currentDayId, ex);
     let lastText = 'No previous session logged';
     if(last && last.length){
-      lastText = 'Last time: ' + last.map(s => ex.bw ? `${s.reps} reps${s.weight ? ' +'+s.weight+'lb':''}` : `${s.weight}lb x ${s.reps}`).join(', ');
+      lastText = 'Last time: ' + last.map(s => ex.bw ? `${s.reps} reps${s.weight ? ' +'+toDisplayWeight(s.weight)+weightUnit:''}` : `${toDisplayWeight(s.weight)}${weightUnit} x ${s.reps}`).join(', ');
     }
+
+    const suggestion = getProgressionSuggestion(ex);
+    const suggestionHtml = suggestion
+      ? `<p class="suggestion suggestion-${suggestion.type}">${suggestion.type === 'add-weight' ? '&#8593;' : '&#9888;'} ${escapeHtml(suggestion.text)}</p>`
+      : '';
 
     html += `<div class="card">
       <div class="ex-name-row">
@@ -574,14 +1123,15 @@ function renderLog(){
         <span class="pr-badge" id="pr-${ex.id}">PR</span>
         <span class="ex-target">${escapeHtml(ex.target)}</span>
       </div>
-      <p class="last-time">${lastText}</p>`;
+      <p class="last-time">${lastText}</p>
+      ${suggestionHtml}`;
 
     (rows[ex.id] || [{weight:'',reps:''}]).forEach((row,idx) => {
       html += `<div class="set-row">
         <span class="set-num">${idx+1}</span>
-        <input type="number" inputmode="decimal" placeholder="${ex.bw ? 'added wt' : 'weight'}" value="${row.weight}" step="2.5"
+        <input type="number" inputmode="decimal" placeholder="${ex.bw ? 'added wt' : 'weight'}" value="${toDisplayWeight(row.weight)}" step="2.5"
           onchange="updateField('${ex.id}', ${idx}, 'weight', this.value)">
-        <span class="unit">lb</span>
+        <span class="unit">${weightUnit}</span>
         <input type="number" inputmode="numeric" placeholder="reps" value="${row.reps}"
           onchange="updateField('${ex.id}', ${idx}, 'reps', this.value)">
         <span class="unit">reps</span>
@@ -606,6 +1156,17 @@ function renderLog(){
   }
 }
 
+function findExerciseMetaByCanonical(canonical){
+  for(const day of program){
+    const match = day.exercises.find(e => canonicalize(e.name) === canonical);
+    if(match) return match;
+  }
+  return null;
+}
+
+let editingSessionId = null;
+let editingSessionDraft = null;
+
 function renderHistory(){
   let html = `<h2 class="day-head">History</h2>`;
   if(history.length === 0){
@@ -613,23 +1174,118 @@ function renderHistory(){
   }else{
     [...history].reverse().forEach(sess => {
       const day = program.find(d => d.id === sess.dayId);
-      const dayName = day ? day.name : '(deleted day)';
+      const dayName = sess.dayName || (day ? day.name : '(deleted day)');
+      const sessId = sess.id || sess.date;
+
+      if(editingSessionId === sessId){
+        html += renderHistoryEditForm(sess, day, dayName);
+        return;
+      }
+
       html += `<div class="history-entry">
         <div class="history-date">${new Date(sess.date).toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'})}</div>
         <div class="history-day">${escapeHtml(dayName)}</div>`;
-      Object.keys(sess.exercises).forEach(exId => {
-        const exMeta = day ? day.exercises.find(e => e.id === exId) : null;
-        const exName = exMeta ? exMeta.name : exId;
-        const sets = sess.exercises[exId];
-        const text = sets.map(s => (exMeta && exMeta.bw) ? `${s.reps}${s.weight ? ' +'+s.weight+'lb':''}` : `${s.weight}x${s.reps}`).join(', ');
+      Object.keys(sess.exercises).forEach(key => {
+        let exMeta = findExerciseMetaByCanonical(key);
+        let exName = exMeta ? exMeta.name : null;
+        if(!exMeta && day){
+          const legacyMatch = day.exercises.find(e => e.id === key);
+          if(legacyMatch){ exMeta = legacyMatch; exName = legacyMatch.name; }
+        }
+        if(!exName) exName = key;
+        const sets = sess.exercises[key];
+        const text = sets.map(s => (exMeta && exMeta.bw) ? `${s.reps}${s.weight ? ' +'+toDisplayWeight(s.weight)+weightUnit:''}` : `${toDisplayWeight(s.weight)}${weightUnit}x${s.reps}`).join(', ');
         html += `<div class="history-ex">${escapeHtml(exName)}: ${text}</div>`;
       });
+      html += `<div class="history-actions">
+          <button class="history-action-btn" onclick="startEditSession('${escapeHtml(sessId)}')">Edit</button>
+          <button class="history-action-btn danger" onclick="deleteSession('${escapeHtml(sessId)}')">Delete</button>
+        </div>`;
       html += `</div>`;
     });
     html += `<button class="clear-btn" onclick="clearHistory()">Clear all history</button>`;
   }
   document.getElementById('main').innerHTML = html;
   document.getElementById('footer').innerHTML = '';
+}
+
+function renderHistoryEditForm(sess, day, dayName){
+  let html = `<div class="history-entry">
+    <div class="history-date">${new Date(sess.date).toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'})}</div>
+    <div class="history-day">${escapeHtml(dayName)} — editing</div>`;
+
+  Object.keys(editingSessionDraft.exercises).forEach(key => {
+    let exMeta = findExerciseMetaByCanonical(key);
+    let exName = exMeta ? exMeta.name : null;
+    if(!exMeta && day){
+      const legacyMatch = day.exercises.find(e => e.id === key);
+      if(legacyMatch){ exMeta = legacyMatch; exName = legacyMatch.name; }
+    }
+    if(!exName) exName = key;
+    const isBw = exMeta && exMeta.bw;
+
+    html += `<div style="margin:0.6rem 0 0.3rem; font-size:0.85rem; font-weight:600;">${escapeHtml(exName)}</div>`;
+    editingSessionDraft.exercises[key].forEach((set, idx) => {
+      html += `<div class="history-edit-row">
+        <span class="history-edit-setnum">${idx+1}</span>
+        <input type="number" inputmode="decimal" placeholder="${isBw ? 'added wt':'weight'}" value="${toDisplayWeight(set.weight)}"
+          onchange="updateEditingSet('${escapeHtml(key)}', ${idx}, 'weight', this.value)">
+        <span class="history-edit-unit">${weightUnit}</span>
+        <input type="number" inputmode="numeric" placeholder="reps" value="${set.reps}"
+          onchange="updateEditingSet('${escapeHtml(key)}', ${idx}, 'reps', this.value)">
+        <span class="history-edit-unit">reps</span>
+      </div>`;
+    });
+  });
+
+  html += `<div class="history-edit-actions">
+      <button class="history-cancel-btn" onclick="cancelEditSession()">Cancel</button>
+      <button class="history-save-btn" onclick="commitEditSession()">Save changes</button>
+    </div>
+  </div>`;
+  return html;
+}
+
+function startEditSession(sessId){
+  const sess = history.find(s => (s.id || s.date) === sessId);
+  if(!sess) return;
+  editingSessionId = sessId;
+  editingSessionDraft = JSON.parse(JSON.stringify(sess));
+  currentView = 'history';
+  render();
+}
+
+function cancelEditSession(){
+  editingSessionId = null;
+  editingSessionDraft = null;
+  render();
+}
+
+function updateEditingSet(key, idx, field, value){
+  if(field === 'weight'){
+    editingSessionDraft.exercises[key][idx][field] = fromDisplayWeight(value);
+  }else{
+    editingSessionDraft.exercises[key][idx][field] = Number(value) || 0;
+  }
+}
+
+async function commitEditSession(){
+  const idx = history.findIndex(s => (s.id || s.date) === editingSessionId);
+  if(idx === -1) return;
+  history[idx] = editingSessionDraft;
+  await saveHistory();
+  if(accessToken) await autoPushToDrive();
+  editingSessionId = null;
+  editingSessionDraft = null;
+  render();
+}
+
+async function deleteSession(sessId){
+  if(!confirm('Delete this single workout entry? This cannot be undone.')) return;
+  history = history.filter(s => (s.id || s.date) !== sessId);
+  await saveHistory();
+  if(accessToken) await autoPushToDrive();
+  render();
 }
 
 /* ---------- Edit mode ---------- */
@@ -869,10 +1525,10 @@ async function saveWorkout(){
 
     if(setRows.length){
       anyLogged = true;
-      const priorBest = bestFor(ex.id);
-      const topThisSession = setRows.reduce((a,b)=> e1rm(b.weight,b.reps) > e1rm(a.weight,a.reps) ? b : a);
-      if(!priorBest || e1rm(topThisSession.weight, topThisSession.reps) > priorBest.score) prs.push(ex.id);
-      sessionExercises[ex.id] = setRows;
+      const priorBest = bestFor(ex);
+      const topThisSession = setRows.reduce((a,b)=> progressScore(ex,b.weight,b.reps) > progressScore(ex,a.weight,a.reps) ? b : a);
+      if(!priorBest || progressScore(ex, topThisSession.weight, topThisSession.reps) > priorBest.score) prs.push(ex.id);
+      sessionExercises[canonicalize(ex.name)] = setRows;
     }
   });
 
@@ -881,7 +1537,7 @@ async function saveWorkout(){
     return;
   }
 
-  history.push({ date: new Date().toISOString(), dayId: currentDayId, exercises: sessionExercises });
+  history.push({ id: uid('sess'), date: new Date().toISOString(), dayId: currentDayId, dayName: day.name, exercises: sessionExercises });
   await saveHistory();
 
   prs.forEach(exId => {
@@ -895,19 +1551,364 @@ async function saveWorkout(){
   if(accessToken) await autoPushToDrive();
 }
 
+/* ---------- Personalization wizard ---------- */
+
+const WIZARD_QUESTIONS = [
+  {
+    key: 'goal',
+    question: "What's your main goal?",
+    hint: 'This shapes rep ranges and exercise selection.',
+    multi: false,
+    options: [
+      { value:'strength', label:'Build strength' },
+      { value:'hypertrophy', label:'Build muscle' },
+      { value:'fatloss', label:'Lose fat / lean out' },
+      { value:'general', label:'General fitness' },
+      { value:'endurance', label:'Endurance / conditioning' },
+    ]
+  },
+  {
+    key: 'experience',
+    question: 'How experienced are you?',
+    hint: 'Affects how many exercises land on each day.',
+    multi: false,
+    options: [
+      { value:'beginner', label:'Beginner' },
+      { value:'intermediate', label:'Intermediate' },
+      { value:'advanced', label:'Advanced' },
+    ]
+  },
+  {
+    key: 'daysPerWeek',
+    question: 'How many days a week can you train?',
+    hint: 'Determines the split structure.',
+    multi: false,
+    options: [
+      { value:2, label:'2 days' },
+      { value:3, label:'3 days' },
+      { value:4, label:'4 days' },
+      { value:5, label:'5 days' },
+      { value:6, label:'6 days' },
+    ]
+  },
+  {
+    key: 'equipment',
+    question: 'What equipment do you have?',
+    hint: 'Select everything available — bodyweight is always included.',
+    multi: true,
+    grid: true,
+    options: [
+      { value:'dumbbell', label:'Dumbbells' },
+      { value:'barbell', label:'Barbell' },
+      { value:'rack', label:'Squat rack' },
+      { value:'bench', label:'Bench' },
+      { value:'ez-bar', label:'EZ curl bar' },
+      { value:'kettlebell', label:'Kettlebell' },
+      { value:'pull-up-bar', label:'Pull-up bar' },
+      { value:'push-up-stands', label:'Push-up stands' },
+      { value:'band', label:'Resistance bands' },
+      { value:'machine', label:'Gym machines' },
+      { value:'jump-rope', label:'Jump rope' },
+    ]
+  },
+  {
+    key: 'focusMuscle',
+    question: 'Want to prioritize a specific area?',
+    hint: 'That area gets an extra exercise on relevant days. Optional.',
+    multi: false,
+    optional: true,
+    options: [
+      { value:null, label:'No specific focus — balanced' },
+      { value:'legs', label:'Legs' },
+      { value:'glutes', label:'Glutes' },
+      { value:'chest', label:'Chest' },
+      { value:'back', label:'Back' },
+      { value:'shoulders', label:'Shoulders' },
+      { value:'biceps', label:'Arms' },
+    ]
+  },
+];
+
+let wizardStep = 0;
+let wizardAnswers = {};
+let pendingGeneratedProgram = null;
+
+const LOADING_MESSAGES = [
+  'Sizing up your goals...',
+  'Raiding the exercise database...',
+  'Matching moves to your equipment...',
+  'Stacking sets and reps...',
+  'Balancing push and pull...',
+  'Sneaking in some extra leg work...',
+  'Sequencing your training week...',
+  'Checking nothing got left out...',
+  'Tightening up the rep ranges...',
+  'Sharpening the program...',
+  'Future you says thanks...',
+  'Strong body, stronger habits...',
+  'No pain, no... well, some gain...',
+  'Programming progress, one set at a time...',
+  'Almost ready to lift...',
+];
+
+const MIN_GENERATION_MS = 10000;
+
+function startWizard(){
+  wizardStep = 0;
+  wizardAnswers = {};
+  currentView = 'wizard';
+  render();
+}
+
+function wizardSelect(key, value, multi){
+  if(multi){
+    const arr = wizardAnswers[key] || [];
+    const idx = arr.indexOf(value);
+    if(idx === -1) arr.push(value); else arr.splice(idx, 1);
+    wizardAnswers[key] = arr;
+  }else{
+    wizardAnswers[key] = value;
+  }
+  renderWizard();
+}
+
+function wizardCanAdvance(){
+  const q = WIZARD_QUESTIONS[wizardStep];
+  if(q.optional) return true;
+  const val = wizardAnswers[q.key];
+  if(q.multi) return Array.isArray(val) && val.length > 0;
+  return val !== undefined && val !== null;
+}
+
+function wizardNext(){
+  if(wizardStep < WIZARD_QUESTIONS.length - 1){
+    wizardStep++;
+    renderWizard();
+  }else{
+    finishWizard();
+  }
+}
+
+function wizardBack(){
+  if(wizardStep > 0){
+    wizardStep--;
+    renderWizard();
+  }else{
+    localStorage.setItem('wizard-completed', '1');
+    currentView = 'log';
+    render();
+  }
+}
+
+function renderWizard(){
+  const q = WIZARD_QUESTIONS[wizardStep];
+  const selected = wizardAnswers[q.key];
+
+  let html = `<div class="wizard-progress">`;
+  WIZARD_QUESTIONS.forEach((_, idx) => {
+    const cls = idx < wizardStep ? 'done' : (idx === wizardStep ? 'current' : '');
+    html += `<div class="wizard-progress-seg ${cls}"></div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="wizard-card">
+    <h2 class="wizard-q">${escapeHtml(q.question)}</h2>
+    <p class="wizard-hint">${escapeHtml(q.hint)}</p>
+    <div class="${q.grid ? 'wizard-opt-grid' : 'wizard-options'}">`;
+
+  q.options.forEach(opt => {
+    let isSelected;
+    if(q.multi){
+      isSelected = Array.isArray(selected) && selected.includes(opt.value);
+    }else{
+      isSelected = selected === opt.value;
+    }
+    html += `<button class="wizard-opt ${isSelected ? 'selected':''}"
+      onclick='wizardSelect(${JSON.stringify(q.key)}, ${JSON.stringify(opt.value)}, ${q.multi})'>${escapeHtml(opt.label)}</button>`;
+  });
+
+  html += `</div>
+    <div class="wizard-nav">
+      <button class="wizard-back" onclick="wizardBack()">${wizardStep === 0 ? 'Cancel' : 'Back'}</button>
+      <button class="wizard-next" ${wizardCanAdvance() ? '' : 'disabled'} onclick="wizardNext()">
+        ${wizardStep === WIZARD_QUESTIONS.length - 1 ? 'Generate program' : 'Next'}
+      </button>
+    </div>
+  </div>`;
+
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('footer').innerHTML = '';
+}
+
+let loadingInterval = null;
+
+function shuffledMessages(){
+  const arr = [...LOADING_MESSAGES];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function renderLoadingScreen(){
+  document.getElementById('nav').innerHTML = '';
+  document.getElementById('footer').innerHTML = '';
+  document.getElementById('main').innerHTML = `
+    <div class="loading-screen">
+      <div class="loading-spinner"></div>
+      <div class="loading-text" id="loading-text">Warming up...</div>
+      <div class="loading-sub">Building your personalized program</div>
+    </div>`;
+
+  const order = shuffledMessages();
+  let msgIdx = 0;
+  const textEl = () => document.getElementById('loading-text');
+
+  if(textEl()) textEl().textContent = order[msgIdx];
+
+  loadingInterval = setInterval(() => {
+    const el = textEl();
+    if(!el) return;
+    el.classList.add('fading');
+    setTimeout(() => {
+      msgIdx = (msgIdx + 1) % order.length;
+      const el2 = textEl();
+      if(!el2) return;
+      el2.textContent = order[msgIdx];
+      el2.classList.remove('fading');
+    }, 300);
+  }, 1600);
+}
+
+function stopLoadingScreen(){
+  if(loadingInterval){
+    clearInterval(loadingInterval);
+    loadingInterval = null;
+  }
+}
+
+async function finishWizard(){
+  currentView = 'loading';
+  renderLoadingScreen();
+
+  const startTime = Date.now();
+
+  const equipment = wizardAnswers.equipment || [];
+  const generated = generatePersonalizedProgram({
+    daysPerWeek: wizardAnswers.daysPerWeek || 4,
+    goal: wizardAnswers.goal || 'general',
+    equipment,
+    focusMuscle: wizardAnswers.focusMuscle || null,
+    experience: wizardAnswers.experience || 'intermediate',
+  });
+
+  const elapsed = Date.now() - startTime;
+  const remaining = Math.max(0, MIN_GENERATION_MS - elapsed);
+  await new Promise(resolve => setTimeout(resolve, remaining));
+
+  stopLoadingScreen();
+
+  const hasExistingProgram = program.length > 0 && program.some(d => d.exercises.length > 0);
+
+  if(!hasExistingProgram){
+    program = generated;
+    await saveProgram();
+    if(accessToken) await autoPushToDrive();
+    currentDayId = program[0] ? program[0].id : null;
+    resetRows();
+    currentView = 'log';
+    localStorage.setItem('wizard-completed', '1');
+    render();
+    return;
+  }
+
+  pendingGeneratedProgram = generated;
+  currentView = 'wizard-resolve';
+  render();
+}
+
+function renderWizardResolve(){
+  let html = `<div class="wizard-card">
+    <h2 class="wizard-q">Apply your new program?</h2>
+    <p class="wizard-hint">You already have a program with exercises in it. Choose how to apply the personalized plan.</p>
+    <div class="wizard-options">
+      <button class="wizard-opt" onclick="resolveWizard('replace')">Replace my current program entirely</button>
+      <button class="wizard-opt" onclick="resolveWizard('merge')">Add these as new days alongside my current ones</button>
+      <button class="wizard-opt" onclick="resolveWizard('cancel')">Cancel — keep what I have</button>
+    </div>
+  </div>`;
+
+  html += `<h3 class="day-head" style="margin-top:1.5rem;">Preview</h3>`;
+  pendingGeneratedProgram.forEach(day => {
+    html += `<div class="wizard-preview-day">
+      <div class="wizard-preview-day-name">${escapeHtml(day.name)}</div>`;
+    day.exercises.forEach(ex => {
+      html += `<div class="wizard-preview-ex">${escapeHtml(ex.name)} — ${escapeHtml(ex.target)}</div>`;
+    });
+    html += `</div>`;
+  });
+
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('footer').innerHTML = '';
+}
+
+async function resolveWizard(action){
+  if(action === 'cancel'){
+    pendingGeneratedProgram = null;
+    localStorage.setItem('wizard-completed', '1');
+    currentView = 'log';
+    render();
+    return;
+  }
+
+  if(action === 'replace'){
+    program = pendingGeneratedProgram;
+  }else if(action === 'merge'){
+    program = [...program, ...pendingGeneratedProgram];
+  }
+
+  await saveProgram();
+  if(accessToken) await autoPushToDrive();
+  pendingGeneratedProgram = null;
+  currentDayId = program[0] ? program[0].id : null;
+  resetRows();
+  currentView = 'log';
+  localStorage.setItem('wizard-completed', '1');
+  render();
+}
+
 function render(){
+  if(currentView === 'loading'){
+    renderLoadingScreen();
+    return;
+  }
   renderNav();
   if(currentView === 'history') renderHistory();
   else if(currentView === 'edit') renderEdit();
+  else if(currentView === 'wizard') renderWizard();
+  else if(currentView === 'wizard-resolve') renderWizardResolve();
   else renderLog();
 }
 
 (async function init(){
   await loadProgram();
   await loadHistory();
+  await loadHeader();
+  loadWeightUnit();
+  renderHeader();
+  renderUnitToggle();
   if(!currentDayId && program.length) currentDayId = program[0].id;
   resetRows();
-  render();
+
+  const wizardAlreadyRun = localStorage.getItem('wizard-completed') === '1';
+
+  if(!wizardAlreadyRun){
+    startWizard();
+  }else{
+    render();
+  }
+
   setSyncStatus('');
   if(localStorage.getItem('gdrive-connected') === '1'){
     try{
