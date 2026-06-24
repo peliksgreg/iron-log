@@ -327,6 +327,70 @@
   }
   .week-dot.done{ background:var(--brass); border-color:var(--brass); }
 
+  /* --- Exercise demo modal --- */
+  .demo-btn{
+    background:none; border:1px solid var(--border); color:var(--text-dim);
+    border-radius:5px; padding:0.25rem 0.6rem; font-size:0.72rem; cursor:pointer;
+    flex:0 0 auto;
+  }
+  .demo-btn:hover{ color:var(--brass); border-color:var(--brass); }
+
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:999;
+    display:flex; align-items:flex-end; justify-content:center;
+    animation:fadeIn 0.18s ease;
+  }
+  @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+
+  .modal{
+    background:var(--surface); border-radius:14px 14px 0 0; width:100%; max-width:640px;
+    max-height:90vh; overflow-y:auto; padding:1.25rem 1.25rem 2rem;
+    animation:slideUp 0.22s ease;
+  }
+  @keyframes slideUp{ from{transform:translateY(60px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+  .modal-header{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:1rem; }
+  .modal-title{ font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.05em; font-size:1.1rem; margin:0; }
+  .modal-close{
+    background:none; border:none; color:var(--text-dim); font-size:1.5rem; cursor:pointer;
+    line-height:1; padding:0 0.25rem;
+  }
+
+  .modal-gif-wrap{
+    width:100%; aspect-ratio:1; max-height:280px; background:var(--surface-2); border-radius:8px;
+    overflow:hidden; display:flex; align-items:center; justify-content:center; margin-bottom:1rem;
+  }
+  .modal-gif{ width:100%; height:100%; object-fit:contain; border-radius:8px; }
+  .modal-gif-skeleton{
+    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+    color:var(--text-dim); font-size:0.82rem; font-family:'JetBrains Mono', monospace;
+  }
+
+  .modal-muscles{ display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+  .muscle-tag{
+    background:rgba(193,89,47,0.15); color:var(--accent); border:1px solid rgba(193,89,47,0.3);
+    border-radius:4px; padding:0.2rem 0.55rem; font-size:0.72rem; font-family:'JetBrains Mono', monospace;
+  }
+  .muscle-tag.secondary{ background:var(--surface-2); color:var(--text-dim); border-color:var(--border); }
+
+  .modal-instructions-title{
+    font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.05em;
+    font-size:0.85rem; color:var(--text-dim); margin:0 0 0.6rem;
+  }
+  .modal-step{ display:flex; gap:0.75rem; margin-bottom:0.6rem; font-size:0.85rem; line-height:1.5; }
+  .modal-step-num{
+    flex:0 0 auto; width:1.4rem; height:1.4rem; background:var(--accent); color:var(--accent-text);
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:0.7rem; font-family:'Oswald', sans-serif; margin-top:0.1rem;
+  }
+  .modal-not-found{ color:var(--text-dim); font-size:0.85rem; text-align:center; padding:1.5rem 0; }
+  .modal-yt-link{
+    display:block; margin:0.75rem auto 0; background:none; border:1px solid var(--border);
+    color:var(--text-dim); border-radius:6px; padding:0.5rem 1rem; font-size:0.8rem; cursor:pointer;
+    text-decoration:none; text-align:center; width:fit-content;
+  }
+  .modal-yt-link:hover{ color:var(--text); }
+
   .suggestion{
     font-size:0.78rem; margin:0 0 0.6rem; padding:0.4rem 0.6rem; border-radius:5px;
     font-family:'JetBrains Mono', monospace;
@@ -340,6 +404,7 @@
 <header>
   <div class="header-edit-row">
     <h1 id="app-title" onclick="startHeaderEdit('title')">Iron log</h1>
+    <button class="header-edit-btn" id="header-edit-btn" onclick="startHeaderEdit('title')" aria-label="Edit header">&#9998;</button>
   </div>
   <p class="subtitle" id="app-subtitle" onclick="startHeaderEdit('subtitle')">Your program, your edits, tracked every session</p>
   <div class="sync-bar">
@@ -357,6 +422,7 @@
 <main id="main"></main>
 
 <footer id="footer"></footer>
+<div id="modal-root"></div>
 
 <script>
 const STORAGE_HISTORY_KEY = 'workout-log';
@@ -1120,6 +1186,7 @@ function renderLog(){
       <div class="ex-name-row">
         <span class="ex-name">${escapeHtml(ex.name)}</span>
         <span class="pr-badge" id="pr-${ex.id}">PR</span>
+        <button class="demo-btn" onclick="showExerciseDemo('${escapeHtml(ex.name).replace(/'/g,"\\'")}')">▶ How to</button>
         <span class="ex-target">${escapeHtml(ex.target)}</span>
       </div>
       <p class="last-time">${lastText}</p>
@@ -1877,6 +1944,173 @@ async function resolveWizard(action){
   render();
 }
 
+/* ---------- Exercise demo modal ---------- */
+
+const EX_DEMO_CACHE = new Map(); // canonical name → { gifUrl, instructions, targetMuscles, secondaryMuscles } | 'not-found'
+const EDB_BASE = 'https://oss.exercisedb.dev/api/v1/exercises';
+const EDB_PAGE_SIZE = 100;
+
+function normalizeForSearch(name){
+  return name.toLowerCase()
+    .replace(/\([^)]*\)/g, '')    // strip anything in parentheses (e.g. "(stands)", "(DB)")
+    .replace(/[\/]/g, ' ')
+    .replace(/\bdb\b/g, 'dumbbell')
+    .replace(/\bez[\s-]*bar\b/g, 'ez bar')
+    .replace(/\brdl\b/g, 'romanian deadlift')
+    .replace(/\bamrap\b/g, '')
+    .replace(/skull\s*crusher/g, 'skull crusher')
+    .replace(/\s+/g, ' ').trim();
+}
+
+function scoreMatch(query, candidateName){
+  const q = query.toLowerCase();
+  const c = candidateName.toLowerCase();
+  if(c === q) return 100;
+  if(c.startsWith(q)) return 85;
+  if(c.includes(q)) return 70;
+  const qWords = q.split(' ').filter(Boolean);
+  const cWords = c.split(' ');
+  const matchedWords = qWords.filter(w => cWords.some(cw => cw.includes(w) || w.includes(cw)));
+  return Math.round((matchedWords.length / qWords.length) * 60);
+}
+
+async function fetchExerciseDemoData(exName){
+  const canonical = canonicalize(exName);
+  if(EX_DEMO_CACHE.has(canonical)) return EX_DEMO_CACHE.get(canonical);
+
+  const query = normalizeForSearch(exName);
+  const queryWords = query.split(' ').filter(Boolean);
+  const firstWord = queryWords[0] || '';
+
+  let bestMatch = null;
+  let bestScore = 0;
+  let cursor = null;
+  let pagesChecked = 0;
+  const MAX_PAGES = 15;
+
+  while(pagesChecked < MAX_PAGES){
+    const url = cursor
+      ? `${EDB_BASE}?limit=${EDB_PAGE_SIZE}&cursor=${cursor}`
+      : `${EDB_BASE}?limit=${EDB_PAGE_SIZE}`;
+
+    let data;
+    try{
+      const res = await fetch(url);
+      data = await res.json();
+    }catch(e){ break; }
+
+    if(!data.success || !data.data) break;
+
+    for(const item of data.data){
+      const score = scoreMatch(query, item.name);
+      if(score > bestScore){
+        bestScore = score;
+        bestMatch = item;
+      }
+    }
+
+    // If we found a very strong match early, stop paging
+    if(bestScore >= 85) break;
+
+    if(!data.meta.hasNextPage) break;
+    cursor = data.meta.nextCursor;
+    pagesChecked++;
+  }
+
+  if(bestMatch && bestScore >= 35){
+    const result = {
+      gifUrl: bestMatch.gifUrl,
+      instructions: bestMatch.instructions || [],
+      targetMuscles: bestMatch.targetMuscles || [],
+      secondaryMuscles: bestMatch.secondaryMuscles || [],
+      matchedName: bestMatch.name,
+    };
+    EX_DEMO_CACHE.set(canonical, result);
+    return result;
+  }
+
+  EX_DEMO_CACHE.set(canonical, 'not-found');
+  return 'not-found';
+}
+
+function closeModal(){
+  const root = document.getElementById('modal-root');
+  if(root) root.innerHTML = '';
+  document.body.style.overflow = '';
+}
+
+function renderModalSkeleton(exName){
+  const root = document.getElementById('modal-root');
+  document.body.style.overflow = 'hidden';
+  root.innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 class="modal-title">${escapeHtml(exName)}</h2>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-gif-wrap">
+          <div class="modal-gif-skeleton">Loading demo...</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderModalContent(exName, data){
+  const root = document.getElementById('modal-root');
+  if(!root || !root.innerHTML) return; // modal was closed while loading
+
+  if(data === 'not-found'){
+    const ytQuery = encodeURIComponent(exName + ' exercise form tutorial');
+    root.innerHTML = `
+      <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+          <div class="modal-header">
+            <h2 class="modal-title">${escapeHtml(exName)}</h2>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+          </div>
+          <div class="modal-not-found">
+            No demo found in the exercise database.
+            <a class="modal-yt-link" href="https://www.youtube.com/results?search_query=${ytQuery}" target="_blank" rel="noopener">Search on YouTube ↗</a>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const targetTags = data.targetMuscles.map(m => `<span class="muscle-tag">${escapeHtml(m)}</span>`).join('');
+  const secondaryTags = data.secondaryMuscles.map(m => `<span class="muscle-tag secondary">${escapeHtml(m)}</span>`).join('');
+
+  const stepsHtml = data.instructions.map((step, idx) => {
+    const text = step.replace(/^Step:\d+\s*/i, '').trim();
+    return `<div class="modal-step">
+      <div class="modal-step-num">${idx+1}</div>
+      <div>${escapeHtml(text)}</div>
+    </div>`;
+  }).join('');
+
+  root.innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 class="modal-title">${escapeHtml(exName)}</h2>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-gif-wrap">
+          <img class="modal-gif" src="${escapeHtml(data.gifUrl)}" alt="${escapeHtml(data.matchedName)} demonstration" loading="lazy">
+        </div>
+        ${(targetTags || secondaryTags) ? `<div class="modal-muscles">${targetTags}${secondaryTags}</div>` : ''}
+        ${stepsHtml ? `<p class="modal-instructions-title">How to perform</p>${stepsHtml}` : ''}
+      </div>
+    </div>`;
+}
+
+async function showExerciseDemo(exName){
+  renderModalSkeleton(exName);
+  const data = await fetchExerciseDemoData(exName);
+  renderModalContent(exName, data);
+}
+
 function render(){
   if(currentView === 'loading'){
     renderLoadingScreen();
@@ -1895,6 +2129,7 @@ function render(){
   await loadHistory();
   await loadHeader();
   loadWeightUnit();
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
   renderHeader();
   renderUnitToggle();
   if(!currentDayId && program.length) currentDayId = program[0].id;
