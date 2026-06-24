@@ -377,6 +377,121 @@
   .modal-img-caption{ color:var(--text-dim); font-size:0.75rem; margin:0; font-style:italic; text-align:center; }
   .modal-img-error{ color:var(--text-dim); font-size:0.82rem; padding:1.5rem; text-align:center; }
 
+  /* --- Dashboard --- */
+  .dash-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:0.85rem; margin-bottom:1rem;
+  }
+  .dash-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:1rem; display:flex; flex-direction:column; gap:0.25rem;
+  }
+  .dash-card.full{ grid-column:1/-1; }
+  .dash-card-label{
+    font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.05em;
+    font-size:0.72rem; color:var(--text-dim);
+  }
+  .dash-card-value{
+    font-family:'JetBrains Mono', monospace; font-size:1.6rem; font-weight:600;
+    color:var(--text); line-height:1;
+  }
+  .dash-card-sub{ font-size:0.75rem; color:var(--text-dim); }
+  .dash-card-delta{ font-size:0.75rem; margin-top:0.2rem; }
+  .dash-card-delta.up{ color:var(--brass); }
+  .dash-card-delta.down{ color:var(--accent); }
+  .dash-card-delta.flat{ color:var(--text-dim); }
+
+  .dash-ring-wrap{
+    display:flex; align-items:center; justify-content:center; gap:1.25rem; padding:0.5rem 0;
+  }
+  .dash-ring{ flex:0 0 auto; }
+  .dash-ring-info{ display:flex; flex-direction:column; gap:0.6rem; }
+  .dash-ring-stat{ display:flex; flex-direction:column; }
+  .dash-ring-stat-val{
+    font-family:'JetBrains Mono', monospace; font-size:1.4rem; font-weight:600;
+    color:var(--text); line-height:1;
+  }
+  .dash-ring-stat-label{ font-size:0.72rem; color:var(--text-dim); margin-top:0.15rem; }
+
+  .dash-section-title{
+    font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.05em;
+    font-size:0.85rem; color:var(--text-dim); margin:1.25rem 0 0.6rem;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+
+  /* Week-over-week bars */
+  .dash-week-bars{ display:flex; align-items:flex-end; gap:6px; height:56px; margin-top:0.5rem; }
+  .dash-week-bar-wrap{ flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .dash-week-bar{
+    width:100%; border-radius:3px 3px 0 0; background:var(--surface-2);
+    min-height:2px; transition:height 0.3s;
+  }
+  .dash-week-bar.current{ background:var(--accent); }
+  .dash-week-bar.full{ background:var(--brass); }
+  .dash-week-label{ font-size:0.6rem; color:var(--text-dim); font-family:'JetBrains Mono', monospace; }
+
+  /* Chart */
+  .dash-chart-ex-selector{
+    display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.75rem;
+  }
+  .dash-ex-pill{
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text-dim);
+    border-radius:20px; padding:0.25rem 0.65rem; font-size:0.72rem; cursor:pointer;
+    white-space:nowrap;
+  }
+  .dash-ex-pill.active{ background:var(--brass); border-color:var(--brass); color:var(--brass-text); }
+
+  /* PRs */
+  .dash-pr-list{ display:flex; flex-direction:column; gap:0.45rem; }
+  .dash-pr-row{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--surface); border:1px solid var(--border); border-radius:7px;
+    padding:0.6rem 0.85rem; gap:0.5rem;
+  }
+  .dash-pr-left{ display:flex; flex-direction:column; flex:1; min-width:0; }
+  .dash-pr-name{ font-size:0.88rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dash-pr-since{ font-size:0.7rem; color:var(--text-dim); margin-top:0.1rem; }
+  .dash-pr-right{ display:flex; flex-direction:column; align-items:flex-end; gap:0.15rem; flex:0 0 auto; }
+  .dash-pr-val{
+    font-family:'JetBrains Mono', monospace; font-size:0.82rem; color:var(--brass); white-space:nowrap;
+  }
+  .dash-pr-improvement{ font-size:0.68rem; color:var(--text-dim); }
+  .dash-pr-badge{
+    background:var(--brass); color:var(--brass-text); font-family:'Oswald', sans-serif;
+    font-size:0.62rem; letter-spacing:0.06em; padding:0.1rem 0.35rem; border-radius:3px;
+    text-transform:uppercase;
+  }
+
+  /* Sessions */
+  .dash-sessions{ display:flex; flex-direction:column; gap:0.45rem; }
+  .dash-session-row{
+    display:flex; align-items:center; gap:0.75rem;
+    background:var(--surface); border:1px solid var(--border); border-radius:7px;
+    padding:0.6rem 0.85rem; cursor:pointer;
+  }
+  .dash-session-row:hover{ border-color:var(--brass); }
+  .dash-session-dot{ width:8px; height:8px; border-radius:50%; background:var(--brass); flex:0 0 auto; }
+  .dash-session-day{ font-size:0.85rem; font-weight:600; flex:1; }
+  .dash-session-meta{ display:flex; flex-direction:column; align-items:flex-end; }
+  .dash-session-date{ font-size:0.72rem; color:var(--text-dim); font-family:'JetBrains Mono', monospace; }
+  .dash-session-excount{ font-size:0.68rem; color:var(--text-dim); }
+
+  /* Volume */
+  .dash-volume-row{ display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem; }
+  .dash-volume-label{ font-size:0.78rem; width:90px; flex:0 0 auto; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dash-volume-bar-bg{ flex:1; background:var(--surface-2); border-radius:3px; height:8px; }
+  .dash-volume-bar{ height:8px; border-radius:3px; background:var(--accent); min-width:2px; }
+  .dash-volume-val{ font-size:0.72rem; color:var(--text-dim); font-family:'JetBrains Mono', monospace; width:52px; text-align:right; flex:0 0 auto; }
+
+  .dash-no-data{ color:var(--text-dim); font-size:0.82rem; text-align:center; padding:1.25rem 0; }
+  .dash-start-btn{
+    display:block; width:100%; background:var(--accent); color:var(--accent-text); border:none;
+    font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.08em;
+    font-size:0.95rem; padding:0.85rem 1.5rem; border-radius:8px; cursor:pointer;
+    margin-top:1.25rem; text-align:center;
+  }
+  .dash-tab{ color:var(--text); }
+  .dash-tab.active{ color:var(--bg); background:var(--surface-2); border-color:var(--border); }
+
   .modal-muscles{ display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; }
   .muscle-tag{
     background:rgba(193,89,47,0.15); color:var(--accent); border:1px solid rgba(193,89,47,0.3);
@@ -671,7 +786,7 @@ function setWeightUnit(unit){
   renderUnitToggle();
   render();
 }
-let currentView = 'log';
+let currentView = 'dashboard';
 let rows = {};
 let editingProgram = [];
 let dragState = null;
@@ -1083,6 +1198,7 @@ function renderNav(){
   const nav = document.getElementById('nav');
   const completedSet = getThisWeekCompletedDayIds();
   let html = '';
+  html += `<button class="tab dash-tab ${currentView==='dashboard' ? 'active':''}" onclick="selectDashboard()">&#9632; Dashboard</button>`;
   program.forEach(d => {
     const done = isDayCompletedThisWeek(d, completedSet);
     html += `<button class="tab ${currentView==='log' && currentDayId===d.id ? 'active':''}" onclick="selectDay('${d.id}')">${done ? '&#10003; ':''}${escapeHtml(d.name)}</button>`;
@@ -1092,6 +1208,7 @@ function renderNav(){
   html += `<button class="tab edit-tab ${currentView==='edit' ? 'active':''}" onclick="selectEdit()">Edit program</button>`;
   nav.innerHTML = html;
 }
+
 
 function selectDay(id){
   currentDayId = id;
@@ -2059,10 +2176,393 @@ function showExerciseDemo(exName){
             onerror="this.parentElement.innerHTML='<div class=\\'modal-img-error\\'>Image not found — make sure the gifs/ folder is committed to your GitHub repo.</div>'"
             loading="lazy">
         </div>
-        <p class="modal-img-caption">Animated — start &rarr; end position</p>
       </div>
     </div>`;
 }
+
+/* ---------- Dashboard ---------- */
+
+let dashChartExIdx = 0; // which exercise to show in the progress chart
+
+function selectDashboard(){ currentView = 'dashboard'; render(); }
+
+function getThisWeekSessions(){
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const diffToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
+  const monday = new Date(now);
+  monday.setHours(0,0,0,0);
+  monday.setDate(now.getDate() - diffToMonday);
+  return history.filter(s => new Date(s.date) >= monday);
+}
+
+function getWeekSessionsCount(weeksAgo){
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const diffToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
+  const monday = new Date(now);
+  monday.setHours(0,0,0,0);
+  monday.setDate(now.getDate() - diffToMonday - weeksAgo * 7);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 7);
+  return history.filter(s => { const d = new Date(s.date); return d >= monday && d < sunday; }).length;
+}
+
+function getWeekVolume(weeksAgo){
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const diff = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
+  const monday = new Date(now);
+  monday.setHours(0,0,0,0);
+  monday.setDate(now.getDate() - diff - weeksAgo * 7);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 7);
+  let vol = 0;
+  history.forEach(sess => {
+    const d = new Date(sess.date);
+    if(d >= monday && d < sunday){
+      Object.values(sess.exercises).forEach(sets => {
+        sets.forEach(s => { vol += s.weight * s.reps; });
+      });
+    }
+  });
+  return Math.round(vol);
+}
+
+function getAllTimePRs(){
+  const prs = {};
+  program.forEach(day => {
+    day.exercises.forEach(ex => {
+      const best = bestFor(ex);
+      if(best && best.score > 0){
+        // Find when this PR was set and what the first session looked like
+        const sessions = getSessionHistoryFor(ex);
+        const prDate = sessions.length ? new Date(history.filter(sess => {
+          const k = canonicalize(ex.name);
+          return sess.exercises[k] || (ex.id && sess.exercises[ex.id]);
+        }).reverse().find(sess => {
+          const k = canonicalize(ex.name);
+          const sets = sess.exercises[k] || (ex.id && sess.exercises[ex.id]) || [];
+          const top = sets.reduce ? sets.reduce((a,b) => progressScore(ex,b.weight,b.reps) > progressScore(ex,a.weight,a.reps) ? b : a, sets[0]) : null;
+          return top && Math.abs(progressScore(ex,top.weight,top.reps) - best.score) < 0.01;
+        })?.date) : null;
+
+        const firstScore = sessions.length ? sessions[0].score : null;
+        prs[ex.name] = { ex, best, prDate, firstScore, sessionCount: sessions.length };
+      }
+    });
+  });
+  return Object.values(prs).sort((a,b) => b.sessionCount - a.sessionCount);
+}
+
+function getExercisesWithHistory(){
+  const result = [];
+  program.forEach(day => {
+    day.exercises.forEach(ex => {
+      const sessions = getSessionHistoryFor(ex);
+      if(sessions.length >= 2) result.push({ ex, sessions });
+    });
+  });
+  return result;
+}
+
+function drawChart(sessions, ex){
+  if(!sessions || sessions.length < 2) return '';
+  const vals = sessions.map(s => s.score);
+  const min = Math.min(...vals) * 0.97;
+  const max = Math.max(...vals) * 1.03;
+  const range = max - min || 1;
+  const W = 280, H = 100, PL = 4, PR = 4, PT = 8, PB = 20;
+  const pts = vals.map((v, i) => {
+    const x = PL + (i / (vals.length - 1)) * (W - PL - PR);
+    const y = PT + (1 - (v - min) / range) * (H - PT - PB);
+    return [Math.round(x*10)/10, Math.round(y*10)/10];
+  });
+  const line = pts.map((p,i) => (i===0?`M${p[0]},${p[1]}`:`L${p[0]},${p[1]}`)).join(' ');
+  const area = line + ` L${pts[pts.length-1][0]},${H-PB} L${pts[0][0]},${H-PB} Z`;
+
+  const unit = ex.bw ? 'reps' : weightUnit;
+  const labels = sessions.map(s => {
+    const v = ex.bw ? s.maxReps : toDisplayWeight(s.topSet.weight);
+    return { x: pts[sessions.indexOf(s)][0], val: v };
+  });
+
+  const trend = vals[vals.length-1] > vals[0]*1.01 ? '↑ Improving' :
+                vals[vals.length-1] < vals[0]*0.99 ? '↓ Declining' : '→ Consistent';
+  const trendColor = trend.startsWith('↑') ? 'var(--brass)' : trend.startsWith('↓') ? 'var(--accent)' : 'var(--text-dim)';
+
+  const firstVal = ex.bw ? sessions[0].maxReps : toDisplayWeight(sessions[0].topSet.weight);
+  const lastVal = ex.bw ? sessions[sessions.length-1].maxReps : toDisplayWeight(sessions[sessions.length-1].topSet.weight);
+
+  const dates = sessions.map(s => new Date(s.date));
+  const firstDate = dates[0].toLocaleDateString(undefined,{month:'short',day:'numeric'});
+  const lastDate = dates[dates.length-1].toLocaleDateString(undefined,{month:'short',day:'numeric'});
+
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;gap:0.5rem;">
+      <div style="font-size:0.78rem;color:var(--text-dim)">${firstDate}: <span style="color:var(--text);font-family:monospace">${firstVal}${unit}</span></div>
+      <div style="font-size:0.78rem;font-weight:600;color:${trendColor}">${trend}</div>
+      <div style="font-size:0.78rem;color:var(--text-dim)">${lastDate}: <span style="color:var(--brass);font-family:monospace">${lastVal}${unit}</span></div>
+    </div>
+    <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none" style="overflow:visible">
+      <defs>
+        <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--brass)" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="var(--brass)" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d="${area}" fill="url(#cg)"/>
+      <path d="${line}" fill="none" stroke="var(--brass)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      ${pts.map((p,i) => `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="var(--brass)" stroke="var(--surface)" stroke-width="1.5"/>`).join('')}
+    </svg>
+    <div style="display:flex;justify-content:space-between;margin-top:0.25rem;">
+      <span style="font-size:0.6rem;color:var(--text-dim)">${firstDate}</span>
+      <span style="font-size:0.6rem;color:var(--text-dim)">${sessions.length} sessions</span>
+      <span style="font-size:0.6rem;color:var(--text-dim)">${lastDate}</span>
+    </div>`;
+}
+
+function calcWeeklyVolume(){
+  // Top 5 exercises by total weight × reps this week
+  const weekSessions = getThisWeekSessions();
+  const vol = {};
+  weekSessions.forEach(sess => {
+    Object.keys(sess.exercises).forEach(key => {
+      const sets = sess.exercises[key];
+      const exMeta = findExerciseMetaByCanonical(key);
+      if(!exMeta || exMeta.bw) return;
+      const name = exMeta ? exMeta.name : key;
+      vol[name] = (vol[name] || 0) + sets.reduce((s,r) => s + r.weight * r.reps, 0);
+    });
+  });
+  return Object.entries(vol)
+    .sort((a,b) => b[1]-a[1])
+    .slice(0, 5)
+    .map(([name, total]) => ({ name, total: Math.round(toDisplayWeight(total)) }));
+}
+
+function renderDashboard(){
+  const weekSessions = getThisWeekSessions();
+  const totalDays = program.length;
+  const completedSet = getThisWeekCompletedDayIds();
+  const completedCount = program.filter(d => isDayCompletedThisWeek(d, completedSet)).length;
+  const prs = getAllTimePRs();
+  const totalSessions = history.length;
+  const exWithHistory = getExercisesWithHistory();
+
+  // Streak
+  function getStreak(){
+    if(!history.length) return 0;
+    let streak = 0;
+    const now = new Date();
+    for(let w = 0; w < 52; w++){
+      const ws = new Date(now);
+      const diff = (ws.getDay()===0?6:ws.getDay()-1);
+      ws.setHours(0,0,0,0);
+      ws.setDate(ws.getDate()-diff-w*7);
+      const we = new Date(ws); we.setDate(ws.getDate()+7);
+      const has = history.some(s=>{ const d=new Date(s.date); return d>=ws&&d<we; });
+      if(has) streak++;
+      else if(w>0) break;
+    }
+    return streak;
+  }
+  const streak = getStreak();
+
+  // Week comparison
+  const thisWeekCount = weekSessions.length;
+  const lastWeekCount = getWeekSessionsCount(1);
+  const sessionDelta = thisWeekCount - lastWeekCount;
+
+  // Total volume this week vs last
+  const thisVol = getWeekVolume(0);
+  const lastVol = getWeekVolume(1);
+  const volDelta = lastVol > 0 ? Math.round((thisVol - lastVol) / lastVol * 100) : 0;
+
+  // Weekly bar chart (8 weeks)
+  const weekCounts = Array.from({length:8}, (_,i) => getWeekSessionsCount(7-i));
+  const maxWeekCount = Math.max(...weekCounts, 1);
+
+  // Ring
+  const pct = totalDays > 0 ? completedCount / totalDays : 0;
+  const R=44, CX=52, CY=52, STR=8;
+  const circ = 2*Math.PI*R;
+  const dash = pct*circ;
+  const ringColor = pct>=1 ? 'var(--brass)' : 'var(--accent)';
+  const ringSvg = `<svg class="dash-ring" width="104" height="104" viewBox="0 0 104 104">
+    <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="${STR}"/>
+    <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${ringColor}" stroke-width="${STR}"
+      stroke-dasharray="${dash} ${circ}" stroke-dashoffset="${circ/4}" stroke-linecap="round"
+      transform="rotate(-90 ${CX} ${CY})"/>
+    <text x="${CX}" y="${CY-6}" text-anchor="middle" dominant-baseline="central"
+      font-family="JetBrains Mono,monospace" font-size="18" font-weight="600" fill="var(--text)">${completedCount}/${totalDays}</text>
+    <text x="${CX}" y="${CY+14}" text-anchor="middle" font-family="sans-serif" font-size="9" fill="var(--text-dim)">DAYS</text>
+  </svg>`;
+
+  let html = `<h2 class="day-head" style="margin-bottom:1.1rem">Dashboard</h2>`;
+
+  /* ---- Row 1: ring + quick stats ---- */
+  html += `<div class="dash-grid">
+    <div class="dash-card full">
+      <div class="dash-card-label">This week</div>
+      <div class="dash-ring-wrap">
+        ${ringSvg}
+        <div class="dash-ring-info">
+          <div class="dash-ring-stat">
+            <span class="dash-ring-stat-val">${thisWeekCount}</span>
+            <span class="dash-ring-stat-label">Sessions this week</span>
+          </div>
+          <div class="dash-ring-stat">
+            <span class="dash-ring-stat-val" style="color:var(--brass)">${streak}</span>
+            <span class="dash-ring-stat-label">Week streak 🔥</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">Sessions</div>
+      <div class="dash-card-value">${thisWeekCount}</div>
+      <div class="dash-card-sub">This week</div>
+      <div class="dash-card-delta ${sessionDelta>0?'up':sessionDelta<0?'down':'flat'}">
+        ${sessionDelta>0?'↑ +'+sessionDelta:sessionDelta<0?'↓ '+sessionDelta:'→ same'} vs last week
+      </div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">Volume</div>
+      <div class="dash-card-value" style="font-size:1.3rem">${thisVol > 0 ? (thisVol >= 1000 ? (thisVol/1000).toFixed(1)+'k' : thisVol) : '—'}</div>
+      <div class="dash-card-sub">${weightUnit} lifted this week</div>
+      ${thisVol > 0 && lastVol > 0 ? `<div class="dash-card-delta ${volDelta>0?'up':volDelta<0?'down':'flat'}">${volDelta>0?'↑ +':'↓ '}${Math.abs(volDelta)}% vs last week</div>` : ''}
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">All time</div>
+      <div class="dash-card-value">${totalSessions}</div>
+      <div class="dash-card-sub">Total sessions</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">PRs</div>
+      <div class="dash-card-value">${prs.length}</div>
+      <div class="dash-card-sub">Exercises tracked</div>
+    </div>
+  </div>`;
+
+  /* ---- 8-week consistency bars ---- */
+  html += `<p class="dash-section-title"><span>8-week consistency</span></p>
+  <div class="dash-card full" style="padding:0.85rem 1rem;">
+    <div class="dash-week-bars">`;
+  const weekLabels = Array.from({length:8}, (_,i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (7-i)*7);
+    return d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+  });
+  weekCounts.forEach((count, i) => {
+    const heightPct = Math.round((count / maxWeekCount) * 100);
+    const isCurrent = i === 7;
+    const isFull = count >= totalDays && totalDays > 0;
+    const barClass = isCurrent ? 'current' : isFull ? 'full' : '';
+    html += `<div class="dash-week-bar-wrap">
+      <div class="dash-week-bar ${barClass}" style="height:${Math.max(heightPct, count > 0 ? 8 : 2)}%;" title="${count} sessions"></div>
+      <div class="dash-week-label">${isCurrent ? 'Now' : weekLabels[i].split(' ')[1]}</div>
+    </div>`;
+  });
+  html += `</div></div>`;
+
+  /* ---- Progress chart with exercise selector ---- */
+  if(exWithHistory.length > 0){
+    if(dashChartExIdx >= exWithHistory.length) dashChartExIdx = 0;
+    const selected = exWithHistory[dashChartExIdx];
+    html += `<p class="dash-section-title"><span>Strength progress</span></p>`;
+    html += `<div class="dash-chart-ex-selector">`;
+    exWithHistory.slice(0, 8).forEach(({ex}, idx) => {
+      html += `<button class="dash-ex-pill ${idx===dashChartExIdx?'active':''}" onclick="dashChartExIdx=${idx};renderDashboard()">${escapeHtml(ex.name)}</button>`;
+    });
+    html += `</div>`;
+    html += `<div class="dash-card full">${drawChart(selected.sessions, selected.ex)}</div>`;
+  }
+
+  /* ---- Weekly volume breakdown ---- */
+  const volBreakdown = calcWeeklyVolume();
+  if(volBreakdown.length > 0){
+    const maxVol = volBreakdown[0].total;
+    html += `<p class="dash-section-title"><span>Volume this week</span></p>
+    <div class="dash-card full" style="gap:0.5rem;">`;
+    volBreakdown.forEach(({name, total}) => {
+      const pct = Math.round((total / maxVol) * 100);
+      html += `<div class="dash-volume-row">
+        <div class="dash-volume-label" title="${escapeHtml(name)}">${escapeHtml(name)}</div>
+        <div class="dash-volume-bar-bg"><div class="dash-volume-bar" style="width:${pct}%"></div></div>
+        <div class="dash-volume-val">${total >= 1000 ? (total/1000).toFixed(1)+'k' : total}${weightUnit}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  /* ---- PRs with context ---- */
+  if(prs.length > 0){
+    html += `<p class="dash-section-title"><span>All-time PRs</span></p>
+    <div class="dash-pr-list">`;
+    prs.slice(0, 8).forEach(({ ex, best, prDate, firstScore, sessionCount }) => {
+      const val = ex.bw
+        ? `${best.reps} reps${best.weight ? ' +'+toDisplayWeight(best.weight)+weightUnit : ''}`
+        : `${toDisplayWeight(best.weight)}${weightUnit} × ${best.reps}`;
+      const prDateStr = prDate
+        ? prDate.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})
+        : null;
+      const improvement = firstScore && best.score > firstScore
+        ? `+${Math.round((best.score - firstScore) / firstScore * 100)}% from first session`
+        : null;
+      html += `<div class="dash-pr-row">
+        <div class="dash-pr-left">
+          <span class="dash-pr-name">${escapeHtml(ex.name)}</span>
+          ${prDateStr ? `<span class="dash-pr-since">Set ${prDateStr} · ${sessionCount} sessions</span>` : ''}
+        </div>
+        <div class="dash-pr-right">
+          <span class="dash-pr-val">${val}</span>
+          ${improvement ? `<span class="dash-pr-improvement">${improvement}</span>` : ''}
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  /* ---- Recent sessions ---- */
+  const recent = [...history].reverse().slice(0, 5);
+  if(recent.length > 0){
+    html += `<p class="dash-section-title"><span>Recent sessions</span></p>
+    <div class="dash-sessions">`;
+    recent.forEach(sess => {
+      const day = program.find(d => d.id === sess.dayId);
+      const dayName = sess.dayName || (day ? day.name : 'Workout');
+      const dateStr = new Date(sess.date).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+      const exCount = Object.keys(sess.exercises).length;
+      html += `<div class="dash-session-row" onclick="selectHistory()">
+        <div class="dash-session-dot"></div>
+        <span class="dash-session-day">${escapeHtml(dayName)}</span>
+        <div class="dash-session-meta">
+          <span class="dash-session-date">${dateStr}</span>
+          <span class="dash-session-excount">${exCount} exercise${exCount!==1?'s':''}</span>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  /* ---- Empty state ---- */
+  if(history.length === 0){
+    html += `<div class="dash-no-data">No sessions logged yet.<br>Tap a day below to start your first workout.</div>`;
+  }
+
+  /* ---- Start today CTA ---- */
+  const nextDay = program.find(d => !isDayCompletedThisWeek(d, completedSet)) || program[0];
+  if(nextDay){
+    html += `<button class="dash-start-btn" onclick="selectDay('${nextDay.id}')">
+      Start today — ${escapeHtml(nextDay.name)} →
+    </button>`;
+  }
+
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('footer').innerHTML = '';
+}
+
 
 function render(){
   if(currentView === 'loading'){
@@ -2070,7 +2570,8 @@ function render(){
     return;
   }
   renderNav();
-  if(currentView === 'history') renderHistory();
+  if(currentView === 'dashboard') renderDashboard();
+  else if(currentView === 'history') renderHistory();
   else if(currentView === 'edit') renderEdit();
   else if(currentView === 'wizard') renderWizard();
   else if(currentView === 'wizard-resolve') renderWizardResolve();
@@ -2093,6 +2594,7 @@ function render(){
   if(!wizardAlreadyRun){
     startWizard();
   }else{
+    currentView = 'dashboard';
     render();
   }
 
