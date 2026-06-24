@@ -356,15 +356,26 @@
     line-height:1; padding:0 0.25rem;
   }
 
-  .modal-gif-wrap{
-    width:100%; aspect-ratio:1; max-height:280px; background:var(--surface-2); border-radius:8px;
-    overflow:hidden; display:flex; align-items:center; justify-content:center; margin-bottom:1rem;
+  .modal-demo-body{ padding:0.5rem 0 0.25rem; }
+  .modal-demo-hint{ color:var(--text-dim); font-size:0.82rem; margin:0 0 1rem; }
+  .modal-yt-btn{
+    display:flex; align-items:center; justify-content:center; gap:0.5rem;
+    background:var(--accent); color:var(--accent-text); text-decoration:none;
+    border-radius:8px; padding:0.9rem 1.25rem; font-family:'Oswald', sans-serif;
+    font-size:0.95rem; text-transform:uppercase; letter-spacing:0.05em;
+    text-align:center; margin-bottom:1.25rem;
   }
-  .modal-gif{ width:100%; height:100%; object-fit:contain; border-radius:8px; }
-  .modal-gif-skeleton{
-    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
-    color:var(--text-dim); font-size:0.82rem; font-family:'JetBrains Mono', monospace;
+  .modal-yt-btn:hover{ opacity:0.9; }
+  .modal-demo-tip{ color:var(--text-dim); font-size:0.78rem; margin:0; font-style:italic; }
+
+  .modal-img-wrap{
+    width:100%; background:var(--surface-2); border-radius:8px;
+    overflow:hidden; margin-bottom:0.75rem; max-height:340px;
+    display:flex; align-items:center; justify-content:center;
   }
+  .modal-img{ width:100%; height:auto; max-height:340px; object-fit:contain; display:block; }
+  .modal-img-caption{ color:var(--text-dim); font-size:0.75rem; margin:0; font-style:italic; text-align:center; }
+  .modal-img-error{ color:var(--text-dim); font-size:0.82rem; padding:1.5rem; text-align:center; }
 
   .modal-muscles{ display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; }
   .muscle-tag{
@@ -1186,7 +1197,7 @@ function renderLog(){
       <div class="ex-name-row">
         <span class="ex-name">${escapeHtml(ex.name)}</span>
         <span class="pr-badge" id="pr-${ex.id}">PR</span>
-        <button class="demo-btn" onclick="showExerciseDemo('${escapeHtml(ex.name).replace(/'/g,"\\'")}')">▶ How to</button>
+        <button class="demo-btn" data-exname="${escapeHtml(ex.name)}" onclick="showExerciseDemo(this.dataset.exname)">&#9654; How to</button>
         <span class="ex-target">${escapeHtml(ex.target)}</span>
       </div>
       <p class="last-time">${lastText}</p>
@@ -1946,91 +1957,62 @@ async function resolveWizard(action){
 
 /* ---------- Exercise demo modal ---------- */
 
-const EX_DEMO_CACHE = new Map(); // canonical name → { gifUrl, instructions, targetMuscles, secondaryMuscles } | 'not-found'
-const EDB_BASE = 'https://oss.exercisedb.dev/api/v1/exercises';
-const EDB_PAGE_SIZE = 100;
+// Maps canonical exercise names to their local image file in the gifs/ folder.
+// Images sourced from free-exercise-db (public domain) — commit the gifs/ folder to your GitHub repo.
+const EXERCISE_IMAGE_MAP = {
+  'goblet squat':                    'exercise-images/goblet-squat.webp',
+  'barbell back squat':              'exercise-images/barbell-squat.webp',
+  'bodyweight squat':                'exercise-images/bodyweight-squat.webp',
+  'bulgarian split squat':           'exercise-images/bulgarian-split-squat.webp',
+  'walking lunge':                   'exercise-images/walking-lunge.webp',
+  'bodyweight lunge':                'exercise-images/bodyweight-lunge.webp',
+  'romanian deadlift':               'exercise-images/romanian-deadlift.webp',
+  'romanian deadlift (db)':          'exercise-images/romanian-deadlift.webp',
+  'barbell deadlift':                'exercise-images/barbell-deadlift.webp',
+  'kettlebell swing':                'exercise-images/kettlebell-swing.webp',
+  'single-leg rdl':                  'exercise-images/single-leg-rdl.webp',
+  'step-up':                         'exercise-images/step-up.webp',
+  'step-up (bench)':                 'exercise-images/step-up.webp',
+  'bench hip thrust':                'exercise-images/hip-thrust.webp',
+  'glute bridge':                    'exercise-images/glute-bridge.webp',
+  'lateral lunge':                   'exercise-images/walking-lunge.webp',
+  'standing calf raise':             'exercise-images/calf-raise.webp',
+  'single-leg calf raise':           'exercise-images/single-leg-calf-raise.webp',
+  'leg press':                       'exercise-images/leg-press.webp',
+  'hip abduction (band)':            'exercise-images/hip-abduction.webp',
+  'barbell bench press':             'exercise-images/barbell-bench.webp',
+  'ez bar bench press':              'exercise-images/ez-bench-press.webp',
+  'db bench press':                  'exercise-images/dumbbell-bench.webp',
+  'push-up':                         'exercise-images/push-up.webp',
+  'push-up (deficit/stands)':        'exercise-images/push-up.webp',
+  'push-up (stands)':                'exercise-images/push-up.webp',
+  'db shoulder press':               'exercise-images/shoulder-press.webp',
+  'pike push-up':                    'exercise-images/pike-push-up.webp',
+  'db flye':                         'exercise-images/chest-fly.webp',
+  'lateral raise':                   'exercise-images/lateral-raise.webp',
+  'ez bar skull crusher':            'exercise-images/skull-crusher.webp',
+  'triceps dip':                     'exercise-images/tricep-dip.webp',
+  'overhead triceps extension':      'exercise-images/overhead-extension.webp',
+  'pull-up':                         'exercise-images/pull-up.webp',
+  'chin-up':                         'exercise-images/chin-up.webp',
+  'assisted pull-up / negative':     'exercise-images/assisted-pull-up.webp',
+  'single-arm db row':               'exercise-images/single-arm-row.webp',
+  'barbell row':                     'exercise-images/barbell-row.webp',
+  'inverted row':                    'exercise-images/inverted-row.webp',
+  'ez bar curl':                     'exercise-images/ez-curl.webp',
+  'db curl':                         'exercise-images/dumbbell-curl.webp',
+  'hammer curl':                     'exercise-images/hammer-curl.webp',
+  'face pull / reverse flye':        'exercise-images/face-pull.webp',
+  'plank':                           'exercise-images/plank.webp',
+  'farmer carry':                    'exercise-images/farmer-carry.webp',
+  'mountain climbers':               'exercise-images/mountain-climbers.webp',
+  'kb goblet sumo squat':            'exercise-images/sumo-squat.webp',
+  'burpees':                         null,
+  'jump rope':                       null,
+};
 
-function normalizeForSearch(name){
-  return name.toLowerCase()
-    .replace(/\([^)]*\)/g, '')    // strip anything in parentheses (e.g. "(stands)", "(DB)")
-    .replace(/[\/]/g, ' ')
-    .replace(/\bdb\b/g, 'dumbbell')
-    .replace(/\bez[\s-]*bar\b/g, 'ez bar')
-    .replace(/\brdl\b/g, 'romanian deadlift')
-    .replace(/\bamrap\b/g, '')
-    .replace(/skull\s*crusher/g, 'skull crusher')
-    .replace(/\s+/g, ' ').trim();
-}
-
-function scoreMatch(query, candidateName){
-  const q = query.toLowerCase();
-  const c = candidateName.toLowerCase();
-  if(c === q) return 100;
-  if(c.startsWith(q)) return 85;
-  if(c.includes(q)) return 70;
-  const qWords = q.split(' ').filter(Boolean);
-  const cWords = c.split(' ');
-  const matchedWords = qWords.filter(w => cWords.some(cw => cw.includes(w) || w.includes(cw)));
-  return Math.round((matchedWords.length / qWords.length) * 60);
-}
-
-async function fetchExerciseDemoData(exName){
-  const canonical = canonicalize(exName);
-  if(EX_DEMO_CACHE.has(canonical)) return EX_DEMO_CACHE.get(canonical);
-
-  const query = normalizeForSearch(exName);
-  const queryWords = query.split(' ').filter(Boolean);
-  const firstWord = queryWords[0] || '';
-
-  let bestMatch = null;
-  let bestScore = 0;
-  let cursor = null;
-  let pagesChecked = 0;
-  const MAX_PAGES = 15;
-
-  while(pagesChecked < MAX_PAGES){
-    const url = cursor
-      ? `${EDB_BASE}?limit=${EDB_PAGE_SIZE}&cursor=${cursor}`
-      : `${EDB_BASE}?limit=${EDB_PAGE_SIZE}`;
-
-    let data;
-    try{
-      const res = await fetch(url);
-      data = await res.json();
-    }catch(e){ break; }
-
-    if(!data.success || !data.data) break;
-
-    for(const item of data.data){
-      const score = scoreMatch(query, item.name);
-      if(score > bestScore){
-        bestScore = score;
-        bestMatch = item;
-      }
-    }
-
-    // If we found a very strong match early, stop paging
-    if(bestScore >= 85) break;
-
-    if(!data.meta.hasNextPage) break;
-    cursor = data.meta.nextCursor;
-    pagesChecked++;
-  }
-
-  if(bestMatch && bestScore >= 35){
-    const result = {
-      gifUrl: bestMatch.gifUrl,
-      instructions: bestMatch.instructions || [],
-      targetMuscles: bestMatch.targetMuscles || [],
-      secondaryMuscles: bestMatch.secondaryMuscles || [],
-      matchedName: bestMatch.name,
-    };
-    EX_DEMO_CACHE.set(canonical, result);
-    return result;
-  }
-
-  EX_DEMO_CACHE.set(canonical, 'not-found');
-  return 'not-found';
+function getExerciseImageUrl(exName){
+  return EXERCISE_IMAGE_MAP[canonicalize(exName)] || null;
 }
 
 function closeModal(){
@@ -2039,28 +2021,12 @@ function closeModal(){
   document.body.style.overflow = '';
 }
 
-function renderModalSkeleton(exName){
+function showExerciseDemo(exName){
+  const imageUrl = getExerciseImageUrl(exName);
   const root = document.getElementById('modal-root');
   document.body.style.overflow = 'hidden';
-  root.innerHTML = `
-    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
-      <div class="modal">
-        <div class="modal-header">
-          <h2 class="modal-title">${escapeHtml(exName)}</h2>
-          <button class="modal-close" onclick="closeModal()">&times;</button>
-        </div>
-        <div class="modal-gif-wrap">
-          <div class="modal-gif-skeleton">Loading demo...</div>
-        </div>
-      </div>
-    </div>`;
-}
 
-function renderModalContent(exName, data){
-  const root = document.getElementById('modal-root');
-  if(!root || !root.innerHTML) return; // modal was closed while loading
-
-  if(data === 'not-found'){
+  if(!imageUrl){
     const ytQuery = encodeURIComponent(exName + ' exercise form tutorial');
     root.innerHTML = `
       <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
@@ -2069,25 +2035,15 @@ function renderModalContent(exName, data){
             <h2 class="modal-title">${escapeHtml(exName)}</h2>
             <button class="modal-close" onclick="closeModal()">&times;</button>
           </div>
-          <div class="modal-not-found">
-            No demo found in the exercise database.
-            <a class="modal-yt-link" href="https://www.youtube.com/results?search_query=${ytQuery}" target="_blank" rel="noopener">Search on YouTube ↗</a>
+          <div class="modal-demo-body">
+            <a class="modal-yt-btn" href="https://www.youtube.com/results?search_query=${ytQuery}" target="_blank" rel="noopener">
+              &#9654;&nbsp;&nbsp;Watch tutorial on YouTube
+            </a>
           </div>
         </div>
       </div>`;
     return;
   }
-
-  const targetTags = data.targetMuscles.map(m => `<span class="muscle-tag">${escapeHtml(m)}</span>`).join('');
-  const secondaryTags = data.secondaryMuscles.map(m => `<span class="muscle-tag secondary">${escapeHtml(m)}</span>`).join('');
-
-  const stepsHtml = data.instructions.map((step, idx) => {
-    const text = step.replace(/^Step:\d+\s*/i, '').trim();
-    return `<div class="modal-step">
-      <div class="modal-step-num">${idx+1}</div>
-      <div>${escapeHtml(text)}</div>
-    </div>`;
-  }).join('');
 
   root.innerHTML = `
     <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
@@ -2096,19 +2052,16 @@ function renderModalContent(exName, data){
           <h2 class="modal-title">${escapeHtml(exName)}</h2>
           <button class="modal-close" onclick="closeModal()">&times;</button>
         </div>
-        <div class="modal-gif-wrap">
-          <img class="modal-gif" src="${escapeHtml(data.gifUrl)}" alt="${escapeHtml(data.matchedName)} demonstration" loading="lazy">
+        <div class="modal-img-wrap">
+          <img class="modal-img"
+            src="${escapeHtml(imageUrl)}"
+            alt="${escapeHtml(exName)} demonstration"
+            onerror="this.parentElement.innerHTML='<div class=\\'modal-img-error\\'>Image not found — make sure the exercise-images/ folder is committed to your GitHub repo.</div>'"
+            loading="lazy">
         </div>
-        ${(targetTags || secondaryTags) ? `<div class="modal-muscles">${targetTags}${secondaryTags}</div>` : ''}
-        ${stepsHtml ? `<p class="modal-instructions-title">How to perform</p>${stepsHtml}` : ''}
+        <p class="modal-img-caption">Animated — start &rarr; end position</p>
       </div>
     </div>`;
-}
-
-async function showExerciseDemo(exName){
-  renderModalSkeleton(exName);
-  const data = await fetchExerciseDemoData(exName);
-  renderModalContent(exName, data);
 }
 
 function render(){
