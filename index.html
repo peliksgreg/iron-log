@@ -1452,6 +1452,7 @@ function startEditSession(sessId){
 function cancelEditSession(){
   editingSessionId = null;
   editingSessionDraft = null;
+  currentView = 'history';
   render();
 }
 
@@ -1471,14 +1472,18 @@ async function commitEditSession(){
   if(accessToken) await autoPushToDrive();
   editingSessionId = null;
   editingSessionDraft = null;
+  currentView = 'history';
   render();
 }
 
 async function deleteSession(sessId){
   if(!confirm('Delete this single workout entry? This cannot be undone.')) return;
   history = history.filter(s => (s.id || s.date) !== sessId);
+  editingSessionId = null;
+  editingSessionDraft = null;
   await saveHistory();
   if(accessToken) await autoPushToDrive();
+  currentView = 'history';
   render();
 }
 
@@ -1696,11 +1701,14 @@ function onDragEnd(e){ dragState = null; }
 async function clearHistory(){
   if(!confirm('This will permanently delete all logged workouts. Continue?')) return;
   history = [];
+  editingSessionId = null;
+  editingSessionDraft = null;
   await saveHistory();
   if(accessToken){
     try{ await writeDriveFile(DRIVE_HISTORY_FILE, []); setSyncStatus('Synced just now'); }
     catch(e){ console.error(e); setSyncStatus('Sync failed — will retry next save'); }
   }
+  currentView = 'history';
   render();
 }
 
