@@ -558,129 +558,265 @@ const STORAGE_HEADER_KEY = 'workout-header';
 const DEFAULT_HEADER = { title: 'Iron log', subtitle: 'Your program, your edits, tracked every session' };
 
 const DEFAULT_PROGRAM = [
-  { id:'d1', name:'Lower body A', sub:'Quad & glute focus', exercises:[
-    { id:'gs',  name:'Goblet squat',          target:'4 x 8-12', bw:false },
-    { id:'rdl', name:'Romanian deadlift',     target:'3 x 10-12', bw:false },
-    { id:'bss', name:'Bulgarian split squat', target:'3 x 10-12 / leg', bw:false },
-    { id:'wl',  name:'Walking lunge',         target:'3 x 12 / leg', bw:false },
-    { id:'hth', name:'Bench hip thrust',      target:'3 x 12-15', bw:false },
-    { id:'cr',  name:'Standing calf raise',   target:'3 x 15-20', bw:false }
+  { id:'d1', name:'Push A', sub:'Chest, shoulders & triceps', exercises:[
+    { id:'bp',  name:'Barbell bench press',     target:'4 x 6-10', bw:false },
+    { id:'ohp', name:'DB shoulder press',       target:'3 x 10-12', bw:false },
+    { id:'idb', name:'Incline DB press',        target:'3 x 10-12', bw:false },
+    { id:'lr',  name:'Lateral raise',           target:'3 x 12-15', bw:false },
+    { id:'pd',  name:'Cable triceps pushdown',  target:'3 x 12-15', bw:false },
+    { id:'sc',  name:'EZ bar skull crusher',    target:'3 x 10-12', bw:false }
   ]},
-  { id:'d2', name:'Upper push', sub:'Chest, shoulders & triceps', exercises:[
-    { id:'bp',  name:'EZ bar bench press',    target:'4 x 6-10', bw:false },
-    { id:'shp', name:'DB shoulder press',     target:'3 x 10-12', bw:false },
-    { id:'pu',  name:'Push-up (stands)',      target:'3 x AMRAP', bw:true },
-    { id:'fly', name:'DB flye',               target:'3 x 12-15', bw:false },
-    { id:'lat', name:'Lateral raise',         target:'3 x 12-15', bw:false },
-    { id:'sc',  name:'EZ bar skull crusher',  target:'3 x 10-12', bw:false }
+  { id:'d2', name:'Pull A', sub:'Back & biceps', exercises:[
+    { id:'plu', name:'Pull-up',                 target:'4 x AMRAP', bw:true },
+    { id:'row', name:'Barbell row',             target:'4 x 8-10', bw:false },
+    { id:'lpd', name:'Lat pulldown',            target:'3 x 10-12', bw:false },
+    { id:'fp',  name:'Cable face pull',         target:'3 x 15-20', bw:false },
+    { id:'cur', name:'EZ bar curl',             target:'3 x 10-12', bw:false },
+    { id:'hc',  name:'Hammer curl',             target:'3 x 10-12', bw:false }
   ]},
-  { id:'d3', name:'Lower body B', sub:'Hamstring & glute focus', exercises:[
-    { id:'dl',  name:'DB deadlift',           target:'4 x 8-10', bw:false },
-    { id:'kbs', name:'Kettlebell swing',      target:'3 x 15-20', bw:false },
-    { id:'su',  name:'Step-up (bench)',       target:'3 x 10-12 / leg', bw:false },
-    { id:'slr', name:'Single-leg RDL',        target:'3 x 10 / leg', bw:false },
-    { id:'ll',  name:'Lateral lunge',         target:'3 x 10-12 / leg', bw:false },
-    { id:'pl',  name:'Plank',                 target:'3 rounds', bw:true }
+  { id:'d3', name:'Legs A', sub:'Quad & calf focus', exercises:[
+    { id:'sq',  name:'Barbell back squat',      target:'4 x 6-10', bw:false },
+    { id:'lp',  name:'Leg press',               target:'4 x 10-12', bw:false },
+    { id:'le',  name:'Leg extension',           target:'3 x 12-15', bw:false },
+    { id:'wl',  name:'Walking lunge',           target:'3 x 12 / leg', bw:false },
+    { id:'cr',  name:'Calf raise machine',      target:'4 x 15-20', bw:false }
   ]},
-  { id:'d4', name:'Upper pull', sub:'Back & biceps', exercises:[
-    { id:'plu', name:'Pull-up',               target:'4 x AMRAP', bw:true },
-    { id:'row', name:'Single-arm DB row',     target:'3 x 10-12 / side', bw:false },
-    { id:'cur', name:'EZ bar curl',           target:'3 x 10-12', bw:false },
-    { id:'hc',  name:'Hammer curl',           target:'3 x 10-12', bw:false },
-    { id:'fp',  name:'Face pull / reverse flye', target:'3 x 15-20', bw:false }
+  { id:'d4', name:'Push B', sub:'Shoulders, chest & triceps', exercises:[
+    { id:'ohp2',name:'Barbell overhead press',  target:'4 x 6-8', bw:false },
+    { id:'idb2',name:'Incline barbell bench press', target:'3 x 8-10', bw:false },
+    { id:'pec', name:'Pec deck machine',        target:'3 x 12-15', bw:false },
+    { id:'lr2', name:'Cable lateral raise',     target:'3 x 12-15', bw:false },
+    { id:'oht', name:'Overhead triceps extension (DB)', target:'3 x 12-15', bw:false },
+    { id:'dip', name:'Bench dip',               target:'3 x 10-15', bw:true }
   ]},
-  { id:'d5', name:'Full body & glutes', sub:'Mixed accessory day', exercises:[
-    { id:'ht2', name:'Bench hip thrust',      target:'4 x 10-15', bw:false },
-    { id:'kb2', name:'Kettlebell swing',      target:'3 x 15-20', bw:false },
-    { id:'sumo',name:'KB goblet sumo squat',  target:'3 x 10-12', bw:false },
-    { id:'slc', name:'Single-leg calf raise', target:'3 x 15 / leg', bw:false },
-    { id:'pu2', name:'Push-up',               target:'3 x AMRAP', bw:true },
-    { id:'fc',  name:'Farmer carry',          target:'3 rounds', bw:true }
+  { id:'d5', name:'Pull B', sub:'Back & biceps', exercises:[
+    { id:'row2',name:'Seated cable row',        target:'4 x 10-12', bw:false },
+    { id:'lpd2',name:'Wide-grip lat pulldown',  target:'3 x 10-12', bw:false },
+    { id:'cir', name:'Chest-supported DB row',  target:'3 x 10-12', bw:false },
+    { id:'sap', name:'Cable straight-arm pulldown', target:'3 x 12-15', bw:false },
+    { id:'idc', name:'Incline DB curl',         target:'3 x 12', bw:false },
+    { id:'ccr', name:'Cable curl',              target:'3 x 12-15', bw:false }
+  ]},
+  { id:'d6', name:'Legs B', sub:'Hamstring, glute & core focus', exercises:[
+    { id:'rdl', name:'Barbell Romanian deadlift', target:'3 x 8-10', bw:false },
+    { id:'ht',  name:'Barbell hip thrust',      target:'4 x 8-12', bw:false },
+    { id:'lc',  name:'Lying leg curl',          target:'3 x 12-15', bw:false },
+    { id:'bss', name:'Bulgarian split squat',   target:'3 x 10-12 / leg', bw:false },
+    { id:'hkr', name:'Hanging knee raise',      target:'3 x 15-20', bw:true }
   ]}
 ];
 
 /* ---------- Personalization engine ---------- */
 
 const EXERCISE_DB = [
-  { name:'Goblet squat', equipment:['dumbbell','kettlebell'], muscle:'legs', pattern:'squat', bw:false, target:'4 x 8-12', goalFit:['strength','hypertrophy','general','fatloss'] },
-  { name:'Barbell back squat', equipment:['barbell','rack'], muscle:'legs', pattern:'squat', bw:false, target:'4 x 6-10', goalFit:['strength','hypertrophy'] },
-  { name:'Bodyweight squat', equipment:[], muscle:'legs', pattern:'squat', bw:true, target:'3 x 15-20', goalFit:['general','fatloss','endurance'] },
-  { name:'Bulgarian split squat', equipment:['dumbbell','bench'], muscle:'legs', pattern:'squat', bw:false, target:'3 x 10-12 / leg', goalFit:['strength','hypertrophy','general'] },
-  { name:'Walking lunge', equipment:['dumbbell'], muscle:'legs', pattern:'lunge', bw:false, target:'3 x 12 / leg', goalFit:['hypertrophy','general','fatloss'] },
-  { name:'Bodyweight lunge', equipment:[], muscle:'legs', pattern:'lunge', bw:true, target:'3 x 15 / leg', goalFit:['general','fatloss','endurance'] },
-  { name:'Romanian deadlift (DB)', equipment:['dumbbell'], muscle:'legs', pattern:'hinge', bw:false, target:'3 x 10-12', goalFit:['strength','hypertrophy','general'] },
-  { name:'Barbell deadlift', equipment:['barbell'], muscle:'legs', pattern:'hinge', bw:false, target:'4 x 5-8', goalFit:['strength','hypertrophy'] },
-  { name:'Kettlebell swing', equipment:['kettlebell'], muscle:'legs', pattern:'hinge', bw:false, target:'3 x 15-20', goalFit:['fatloss','general','endurance'] },
-  { name:'Single-leg RDL', equipment:['dumbbell'], muscle:'legs', pattern:'hinge', bw:false, target:'3 x 10 / leg', goalFit:['strength','hypertrophy','general'] },
-  { name:'Step-up', equipment:['dumbbell','bench'], muscle:'legs', pattern:'squat', bw:false, target:'3 x 10-12 / leg', goalFit:['hypertrophy','general','fatloss'] },
-  { name:'Bench hip thrust', equipment:['dumbbell','bench'], muscle:'glutes', pattern:'hinge', bw:false, target:'3 x 12-15', goalFit:['strength','hypertrophy','general'] },
-  { name:'Glute bridge', equipment:[], muscle:'glutes', pattern:'hinge', bw:true, target:'3 x 15-20', goalFit:['general','fatloss'] },
-  { name:'Lateral lunge', equipment:['dumbbell'], muscle:'legs', pattern:'lunge', bw:false, target:'3 x 10-12 / leg', goalFit:['hypertrophy','general'] },
-  { name:'Standing calf raise', equipment:['dumbbell'], muscle:'calves', pattern:'isolation', bw:false, target:'3 x 15-20', goalFit:['hypertrophy','general'] },
-  { name:'Single-leg calf raise', equipment:[], muscle:'calves', pattern:'isolation', bw:true, target:'3 x 15 / leg', goalFit:['general','fatloss'] },
-  { name:'Leg press', equipment:['machine'], muscle:'legs', pattern:'squat', bw:false, target:'4 x 10-12', goalFit:['strength','hypertrophy'] },
-  { name:'Hip abduction (band)', equipment:['band'], muscle:'glutes', pattern:'isolation', bw:false, target:'3 x 15-20', goalFit:['general','hypertrophy'] },
+  /* ============ LEGS — SQUAT ============ */
+  { name:'Barbell back squat', equipment:['barbell','rack'], muscle:'legs', pattern:'squat', bw:false, target:'4 x 6-10', goalFit:['strength','hypertrophy'], avoidIf:['knee','lower-back'] },
+  { name:'Barbell front squat', equipment:['barbell','rack'], muscle:'legs', pattern:'squat', bw:false, target:'4 x 6-8', goalFit:['strength','hypertrophy'], avoidIf:['knee','lower-back','wrist'] },
+  { name:'Smith machine squat', equipment:['smith'], muscle:'legs', pattern:'squat', bw:false, target:'4 x 8-12', goalFit:['strength','hypertrophy','general'], avoidIf:['knee'] },
+  { name:'Smith machine front squat', equipment:['smith'], muscle:'legs', pattern:'squat', bw:false, target:'3 x 8-12', goalFit:['hypertrophy','general'], avoidIf:['knee','wrist'] },
+  { name:'Leg press', equipment:['machine'], muscle:'legs', pattern:'squat', bw:false, target:'4 x 10-12', goalFit:['strength','hypertrophy','general'], avoidIf:['knee'] },
+  { name:'Narrow-stance leg press', equipment:['machine'], muscle:'legs', pattern:'squat', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'], avoidIf:['knee'] },
+  { name:'Goblet squat', equipment:['dumbbell'], muscle:'legs', pattern:'squat', bw:false, target:'4 x 8-12', goalFit:['strength','hypertrophy','general','fatloss'], avoidIf:['knee'] },
+  { name:'KB goblet squat', equipment:['kettlebell'], muscle:'legs', pattern:'squat', bw:false, target:'4 x 8-12', goalFit:['strength','hypertrophy','general','fatloss'], avoidIf:['knee'] },
+  { name:'Bulgarian split squat', equipment:['dumbbell','bench'], muscle:'legs', pattern:'squat', bw:false, target:'3 x 10-12 / leg', goalFit:['strength','hypertrophy','general'], avoidIf:['knee'] },
+  { name:'Smith machine split squat', equipment:['smith'], muscle:'legs', pattern:'squat', bw:false, target:'3 x 10-12 / leg', goalFit:['hypertrophy','general'], avoidIf:['knee'] },
+  { name:'Step-up', equipment:['dumbbell','bench'], muscle:'legs', pattern:'squat', bw:false, target:'3 x 10-12 / leg', goalFit:['hypertrophy','general','fatloss'], avoidIf:['knee'] },
+  { name:'Box step-up', equipment:['plyo-box','dumbbell'], muscle:'legs', pattern:'squat', bw:false, target:'3 x 12 / leg', goalFit:['general','fatloss','endurance'], avoidIf:['knee'] },
+  { name:'Bodyweight squat', equipment:[], muscle:'legs', pattern:'squat', bw:true, target:'3 x 15-20', goalFit:['general','fatloss','endurance'], avoidIf:[] },
+  { name:'TRX squat', equipment:['trx'], muscle:'legs', pattern:'squat', bw:true, target:'3 x 15-20', goalFit:['general','fatloss','endurance'], avoidIf:[] },
+  { name:'TRX pistol squat', equipment:['trx'], muscle:'legs', pattern:'squat', bw:true, target:'3 x 8 / leg', goalFit:['strength','general'], avoidIf:['knee'] },
+  { name:'Wall sit', equipment:[], muscle:'legs', pattern:'squat', bw:true, target:'3 x 45 sec', goalFit:['endurance','general','fatloss'], avoidIf:['knee'] },
+  { name:'Leg extension', equipment:['machine'], muscle:'legs', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','general'], avoidIf:['knee'] },
 
-  { name:'Barbell bench press', equipment:['barbell','bench'], muscle:'chest', pattern:'push', bw:false, target:'4 x 6-10', goalFit:['strength','hypertrophy'] },
-  { name:'EZ bar bench press', equipment:['ez-bar','bench'], muscle:'chest', pattern:'push', bw:false, target:'4 x 6-10', goalFit:['strength','hypertrophy'] },
-  { name:'DB bench press', equipment:['dumbbell','bench'], muscle:'chest', pattern:'push', bw:false, target:'4 x 8-12', goalFit:['strength','hypertrophy','general'] },
-  { name:'Push-up', equipment:[], muscle:'chest', pattern:'push', bw:true, target:'3 x AMRAP', goalFit:['general','fatloss','endurance'] },
-  { name:'Push-up (deficit/stands)', equipment:['push-up-stands'], muscle:'chest', pattern:'push', bw:true, target:'3 x AMRAP', goalFit:['hypertrophy','general'] },
-  { name:'DB shoulder press', equipment:['dumbbell'], muscle:'shoulders', pattern:'push', bw:false, target:'3 x 10-12', goalFit:['strength','hypertrophy','general'] },
-  { name:'Pike push-up', equipment:[], muscle:'shoulders', pattern:'push', bw:true, target:'3 x 10-15', goalFit:['general','fatloss'] },
-  { name:'DB flye', equipment:['dumbbell','bench'], muscle:'chest', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'] },
-  { name:'Lateral raise', equipment:['dumbbell'], muscle:'shoulders', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','general'] },
-  { name:'EZ bar skull crusher', equipment:['ez-bar','bench'], muscle:'triceps', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','strength'] },
-  { name:'Triceps dip', equipment:['bench'], muscle:'triceps', pattern:'push', bw:true, target:'3 x 10-15', goalFit:['general','hypertrophy'] },
-  { name:'Overhead triceps extension', equipment:['dumbbell'], muscle:'triceps', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'] },
+  /* ============ LEGS — HINGE ============ */
+  { name:'Barbell deadlift', equipment:['barbell'], muscle:'legs', pattern:'hinge', bw:false, target:'4 x 5-8', goalFit:['strength','hypertrophy'], avoidIf:['lower-back'] },
+  { name:'Barbell Romanian deadlift', equipment:['barbell'], muscle:'legs', pattern:'hinge', bw:false, target:'3 x 8-10', goalFit:['strength','hypertrophy'], avoidIf:['lower-back'] },
+  { name:'Romanian deadlift (DB)', equipment:['dumbbell'], muscle:'legs', pattern:'hinge', bw:false, target:'3 x 10-12', goalFit:['strength','hypertrophy','general'], avoidIf:['lower-back'] },
+  { name:'Smith machine RDL', equipment:['smith'], muscle:'legs', pattern:'hinge', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','general'], avoidIf:['lower-back'] },
+  { name:'Single-leg RDL', equipment:['dumbbell'], muscle:'legs', pattern:'hinge', bw:false, target:'3 x 10 / leg', goalFit:['strength','hypertrophy','general'], avoidIf:['lower-back'] },
+  { name:'Lying leg curl', equipment:['machine'], muscle:'legs', pattern:'hinge', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','general'], avoidIf:['knee'] },
+  { name:'Seated leg curl', equipment:['machine'], muscle:'legs', pattern:'hinge', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','general'], avoidIf:['knee'] },
+  { name:'Cable pull-through', equipment:['cable'], muscle:'legs', pattern:'hinge', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','general'], avoidIf:['lower-back'] },
+  { name:'Kettlebell swing', equipment:['kettlebell'], muscle:'legs', pattern:'hinge', bw:false, target:'3 x 15-20', goalFit:['fatloss','general','endurance'], avoidIf:['lower-back','shoulder'] },
+  { name:'Back extension', equipment:['hyperextension'], muscle:'legs', pattern:'hinge', bw:true, target:'3 x 12-15', goalFit:['general','hypertrophy'], avoidIf:['lower-back'] },
+  { name:'TRX hamstring curl', equipment:['trx'], muscle:'legs', pattern:'hinge', bw:true, target:'3 x 12-15', goalFit:['general','hypertrophy'], avoidIf:[] },
 
-  { name:'Pull-up', equipment:['pull-up-bar'], muscle:'back', pattern:'pull', bw:true, target:'4 x AMRAP', goalFit:['strength','hypertrophy','general'] },
-  { name:'Chin-up', equipment:['pull-up-bar'], muscle:'back', pattern:'pull', bw:true, target:'4 x AMRAP', goalFit:['strength','hypertrophy'] },
-  { name:'Single-arm DB row', equipment:['dumbbell','bench'], muscle:'back', pattern:'pull', bw:false, target:'3 x 10-12 / side', goalFit:['strength','hypertrophy','general'] },
-  { name:'Barbell row', equipment:['barbell'], muscle:'back', pattern:'pull', bw:false, target:'4 x 8-10', goalFit:['strength','hypertrophy'] },
-  { name:'Inverted row', equipment:['pull-up-bar'], muscle:'back', pattern:'pull', bw:true, target:'3 x 10-15', goalFit:['general','fatloss'] },
-  { name:'EZ bar curl', equipment:['ez-bar'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','strength'] },
-  { name:'DB curl', equipment:['dumbbell'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','general'] },
-  { name:'Hammer curl', equipment:['dumbbell'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy'] },
-  { name:'Face pull / reverse flye', equipment:['band'], muscle:'shoulders', pattern:'pull', bw:false, target:'3 x 15-20', goalFit:['general','hypertrophy'] },
+  /* ============ LEGS — LUNGE ============ */
+  { name:'Walking lunge', equipment:['dumbbell'], muscle:'legs', pattern:'lunge', bw:false, target:'3 x 12 / leg', goalFit:['hypertrophy','general','fatloss'], avoidIf:['knee'] },
+  { name:'Reverse lunge', equipment:['dumbbell'], muscle:'legs', pattern:'lunge', bw:false, target:'3 x 12 / leg', goalFit:['hypertrophy','general'], avoidIf:['knee'] },
+  { name:'Lateral lunge', equipment:['dumbbell'], muscle:'legs', pattern:'lunge', bw:false, target:'3 x 10-12 / leg', goalFit:['hypertrophy','general'], avoidIf:['knee'] },
+  { name:'Smith machine lunge', equipment:['smith'], muscle:'legs', pattern:'lunge', bw:false, target:'3 x 10-12 / leg', goalFit:['hypertrophy','general'], avoidIf:['knee'] },
+  { name:'Bodyweight lunge', equipment:[], muscle:'legs', pattern:'lunge', bw:true, target:'3 x 15 / leg', goalFit:['general','fatloss','endurance'], avoidIf:['knee'] },
 
-  { name:'Plank', equipment:[], muscle:'core', pattern:'core', bw:true, target:'3 rounds', goalFit:['general','fatloss','endurance'] },
-  { name:'Farmer carry', equipment:['dumbbell'], muscle:'core', pattern:'carry', bw:true, target:'3 rounds', goalFit:['strength','general','fatloss'] },
-  { name:'Mountain climbers', equipment:[], muscle:'core', pattern:'core', bw:true, target:'3 x 20', goalFit:['fatloss','endurance'] },
-  { name:'KB goblet sumo squat', equipment:['kettlebell'], muscle:'legs', pattern:'squat', bw:false, target:'3 x 10-12', goalFit:['general','hypertrophy'] },
-  { name:'Burpees', equipment:[], muscle:'core', pattern:'conditioning', bw:true, target:'3 x 12-15', goalFit:['fatloss','endurance'] },
-  { name:'Jump rope', equipment:['jump-rope'], muscle:'core', pattern:'conditioning', bw:true, target:'5 x 1 min', goalFit:['fatloss','endurance'] },
+  /* ============ GLUTES ============ */
+  { name:'Barbell hip thrust', equipment:['barbell','bench'], muscle:'glutes', pattern:'hinge', bw:false, target:'4 x 8-12', goalFit:['strength','hypertrophy','general'], avoidIf:['lower-back'] },
+  { name:'Smith machine hip thrust', equipment:['smith','bench'], muscle:'glutes', pattern:'hinge', bw:false, target:'4 x 10-12', goalFit:['hypertrophy','general'], avoidIf:['lower-back'] },
+  { name:'Bench hip thrust', equipment:['dumbbell','bench'], muscle:'glutes', pattern:'hinge', bw:false, target:'3 x 12-15', goalFit:['strength','hypertrophy','general'], avoidIf:[] },
+  { name:'Glute bridge', equipment:[], muscle:'glutes', pattern:'hinge', bw:true, target:'3 x 15-20', goalFit:['general','fatloss'], avoidIf:[] },
+  { name:'Sumo deadlift', equipment:['barbell'], muscle:'glutes', pattern:'hinge', bw:false, target:'4 x 5-8', goalFit:['strength','hypertrophy'], avoidIf:['lower-back','knee'] },
+  { name:'KB sumo squat', equipment:['kettlebell'], muscle:'glutes', pattern:'squat', bw:false, target:'3 x 10-12', goalFit:['general','hypertrophy'], avoidIf:['knee'] },
+  { name:'Cable glute kickback', equipment:['cable'], muscle:'glutes', pattern:'isolation', bw:false, target:'3 x 15 / leg', goalFit:['hypertrophy','general'], avoidIf:[] },
+  { name:'Hip abduction machine', equipment:['machine'], muscle:'glutes', pattern:'isolation', bw:false, target:'3 x 15-20', goalFit:['general','hypertrophy'], avoidIf:[] },
+  { name:'Hip adduction machine', equipment:['machine'], muscle:'glutes', pattern:'isolation', bw:false, target:'3 x 15-20', goalFit:['general','hypertrophy'], avoidIf:[] },
+  { name:'Banded hip abduction', equipment:['band'], muscle:'glutes', pattern:'isolation', bw:false, target:'3 x 15-20', goalFit:['general','hypertrophy'], avoidIf:[] },
+  { name:'Cable hip abduction', equipment:['cable'], muscle:'glutes', pattern:'isolation', bw:false, target:'3 x 15 / side', goalFit:['hypertrophy','general'], avoidIf:[] },
+
+  /* ============ CALVES ============ */
+  { name:'Calf raise machine', equipment:['machine'], muscle:'calves', pattern:'isolation', bw:false, target:'4 x 15-20', goalFit:['hypertrophy','general','strength'], avoidIf:[] },
+  { name:'Smith machine calf raise', equipment:['smith'], muscle:'calves', pattern:'isolation', bw:false, target:'4 x 15-20', goalFit:['hypertrophy','strength'], avoidIf:[] },
+  { name:'Leg press calf raise', equipment:['machine'], muscle:'calves', pattern:'isolation', bw:false, target:'3 x 15-20', goalFit:['hypertrophy','general'], avoidIf:['knee'] },
+  { name:'Standing calf raise (DB)', equipment:['dumbbell'], muscle:'calves', pattern:'isolation', bw:false, target:'4 x 15-20', goalFit:['hypertrophy','general'], avoidIf:[] },
+  { name:'Single-leg calf raise', equipment:[], muscle:'calves', pattern:'isolation', bw:true, target:'3 x 15 / leg', goalFit:['general','fatloss'], avoidIf:[] },
+
+  /* ============ CHEST — PRESS ============ */
+  { name:'Barbell bench press', equipment:['barbell','bench'], muscle:'chest', pattern:'push', bw:false, target:'4 x 6-10', goalFit:['strength','hypertrophy'], avoidIf:['shoulder','wrist'] },
+  { name:'Incline barbell bench press', equipment:['barbell','bench'], muscle:'chest', pattern:'push', bw:false, target:'4 x 6-10', goalFit:['strength','hypertrophy'], avoidIf:['shoulder','wrist'] },
+  { name:'Decline barbell bench press', equipment:['barbell','bench'], muscle:'chest', pattern:'push', bw:false, target:'3 x 8-10', goalFit:['hypertrophy','strength'], avoidIf:['shoulder','wrist'] },
+  { name:'DB bench press', equipment:['dumbbell','bench'], muscle:'chest', pattern:'push', bw:false, target:'4 x 8-12', goalFit:['strength','hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Incline DB press', equipment:['dumbbell','bench'], muscle:'chest', pattern:'push', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Decline DB press', equipment:['dumbbell','bench'], muscle:'chest', pattern:'push', bw:false, target:'3 x 10-12', goalFit:['hypertrophy'], avoidIf:['shoulder'] },
+  { name:'Smith machine bench press', equipment:['smith','bench'], muscle:'chest', pattern:'push', bw:false, target:'4 x 8-12', goalFit:['strength','hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Smith machine incline press', equipment:['smith','bench'], muscle:'chest', pattern:'push', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Chest press machine', equipment:['machine'], muscle:'chest', pattern:'push', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'EZ bar bench press', equipment:['ez-bar','bench'], muscle:'chest', pattern:'push', bw:false, target:'4 x 6-10', goalFit:['strength','hypertrophy'], avoidIf:['shoulder'] },
+  { name:'Push-up', equipment:[], muscle:'chest', pattern:'push', bw:true, target:'3 x AMRAP', goalFit:['general','fatloss','endurance'], avoidIf:['wrist','shoulder'] },
+  { name:'Push-up (stands)', equipment:['push-up-stands'], muscle:'chest', pattern:'push', bw:true, target:'3 x AMRAP', goalFit:['hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'TRX chest press', equipment:['trx'], muscle:'chest', pattern:'push', bw:true, target:'3 x 12-15', goalFit:['general','hypertrophy','endurance'], avoidIf:['shoulder'] },
+  { name:'Medicine ball chest pass', equipment:['medicine-ball'], muscle:'chest', pattern:'push', bw:false, target:'3 x 12', goalFit:['fatloss','endurance','general'], avoidIf:['shoulder'] },
+
+  /* ============ CHEST — ISOLATION ============ */
+  { name:'Pec deck machine', equipment:['machine'], muscle:'chest', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Cable crossover', equipment:['cable'], muscle:'chest', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Cable flye (low to high)', equipment:['cable'], muscle:'chest', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'], avoidIf:['shoulder'] },
+  { name:'Cable flye (high to low)', equipment:['cable'], muscle:'chest', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'], avoidIf:['shoulder'] },
+  { name:'DB flye', equipment:['dumbbell','bench'], muscle:'chest', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'], avoidIf:['shoulder'] },
+  { name:'Incline DB flye', equipment:['dumbbell','bench'], muscle:'chest', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'], avoidIf:['shoulder'] },
+  { name:'DB pullover', equipment:['dumbbell','bench'], muscle:'chest', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'], avoidIf:['shoulder'] },
+
+  /* ============ SHOULDERS ============ */
+  { name:'Barbell overhead press', equipment:['barbell','rack'], muscle:'shoulders', pattern:'push', bw:false, target:'4 x 6-8', goalFit:['strength','hypertrophy'], avoidIf:['shoulder','lower-back'] },
+  { name:'DB shoulder press', equipment:['dumbbell'], muscle:'shoulders', pattern:'push', bw:false, target:'4 x 10-12', goalFit:['strength','hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Seated DB shoulder press', equipment:['dumbbell','bench'], muscle:'shoulders', pattern:'push', bw:false, target:'4 x 10-12', goalFit:['strength','hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Shoulder press machine', equipment:['machine'], muscle:'shoulders', pattern:'push', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Smith machine overhead press', equipment:['smith'], muscle:'shoulders', pattern:'push', bw:false, target:'4 x 8-12', goalFit:['strength','hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Arnold press', equipment:['dumbbell','bench'], muscle:'shoulders', pattern:'push', bw:false, target:'3 x 10-12', goalFit:['hypertrophy'], avoidIf:['shoulder'] },
+  { name:'Lateral raise', equipment:['dumbbell'], muscle:'shoulders', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Cable lateral raise', equipment:['cable'], muscle:'shoulders', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'DB front raise', equipment:['dumbbell'], muscle:'shoulders', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Cable front raise', equipment:['cable'], muscle:'shoulders', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'], avoidIf:['shoulder'] },
+  { name:'Rear delt flye (DB)', equipment:['dumbbell','bench'], muscle:'shoulders', pattern:'isolation', bw:false, target:'3 x 15-20', goalFit:['hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Reverse pec deck', equipment:['machine'], muscle:'shoulders', pattern:'isolation', bw:false, target:'3 x 15-20', goalFit:['hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Cable face pull', equipment:['cable'], muscle:'shoulders', pattern:'pull', bw:false, target:'3 x 15-20', goalFit:['general','hypertrophy','strength'], avoidIf:[] },
+  { name:'Band face pull', equipment:['band'], muscle:'shoulders', pattern:'pull', bw:false, target:'3 x 15-20', goalFit:['general','hypertrophy'], avoidIf:[] },
+  { name:'Cable upright row', equipment:['cable'], muscle:'shoulders', pattern:'pull', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'], avoidIf:['shoulder'] },
+  { name:'DB shrug', equipment:['dumbbell'], muscle:'shoulders', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','strength'], avoidIf:[] },
+  { name:'Barbell shrug', equipment:['barbell'], muscle:'shoulders', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','strength'], avoidIf:[] },
+  { name:'Pike push-up', equipment:[], muscle:'shoulders', pattern:'push', bw:true, target:'3 x 10-15', goalFit:['general','fatloss'], avoidIf:['shoulder','wrist'] },
+
+  /* ============ BACK — VERTICAL PULL ============ */
+  { name:'Pull-up', equipment:['pull-up-bar'], muscle:'back', pattern:'pull', bw:true, target:'4 x AMRAP', goalFit:['strength','hypertrophy','general'], avoidIf:['shoulder','elbow'] },
+  { name:'Chin-up', equipment:['pull-up-bar'], muscle:'back', pattern:'pull', bw:true, target:'4 x AMRAP', goalFit:['strength','hypertrophy'], avoidIf:['shoulder','elbow'] },
+  { name:'Assisted pull-up / negative', equipment:['pull-up-bar'], muscle:'back', pattern:'pull', bw:true, target:'4 x 5-8', goalFit:['general'], avoidIf:['shoulder','elbow'] },
+  { name:'Lat pulldown', equipment:['cable'], muscle:'back', pattern:'pull', bw:false, target:'4 x 10-12', goalFit:['strength','hypertrophy','general'], avoidIf:['shoulder'] },
+  { name:'Wide-grip lat pulldown', equipment:['cable'], muscle:'back', pattern:'pull', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','strength'], avoidIf:['shoulder'] },
+  { name:'Close-grip lat pulldown', equipment:['cable'], muscle:'back', pattern:'pull', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','general'], avoidIf:['shoulder','elbow'] },
+  { name:'Reverse-grip lat pulldown', equipment:['cable'], muscle:'back', pattern:'pull', bw:false, target:'3 x 10-12', goalFit:['hypertrophy'], avoidIf:['shoulder','elbow'] },
+  { name:'Cable straight-arm pulldown', equipment:['cable'], muscle:'back', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'], avoidIf:['shoulder'] },
+
+  /* ============ BACK — HORIZONTAL PULL ============ */
+  { name:'Seated cable row', equipment:['cable'], muscle:'back', pattern:'pull', bw:false, target:'4 x 10-12', goalFit:['strength','hypertrophy','general'], avoidIf:['lower-back'] },
+  { name:'Wide-grip cable row', equipment:['cable'], muscle:'back', pattern:'pull', bw:false, target:'3 x 10-12', goalFit:['hypertrophy'], avoidIf:['lower-back','shoulder'] },
+  { name:'Single-arm cable row', equipment:['cable'], muscle:'back', pattern:'pull', bw:false, target:'3 x 12 / side', goalFit:['hypertrophy','general'], avoidIf:[] },
+  { name:'T-bar row', equipment:['machine'], muscle:'back', pattern:'pull', bw:false, target:'4 x 8-10', goalFit:['strength','hypertrophy'], avoidIf:['lower-back'] },
+  { name:'Barbell row', equipment:['barbell'], muscle:'back', pattern:'pull', bw:false, target:'4 x 8-10', goalFit:['strength','hypertrophy'], avoidIf:['lower-back'] },
+  { name:'Pendlay row', equipment:['barbell'], muscle:'back', pattern:'pull', bw:false, target:'4 x 6-8', goalFit:['strength'], avoidIf:['lower-back'] },
+  { name:'Single-arm DB row', equipment:['dumbbell','bench'], muscle:'back', pattern:'pull', bw:false, target:'3 x 10-12 / side', goalFit:['strength','hypertrophy','general'], avoidIf:['lower-back'] },
+  { name:'Chest-supported DB row', equipment:['dumbbell','bench'], muscle:'back', pattern:'pull', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','general'], avoidIf:[] },
+  { name:'Smith machine row', equipment:['smith'], muscle:'back', pattern:'pull', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','general'], avoidIf:['lower-back'] },
+  { name:'Inverted row', equipment:['smith'], muscle:'back', pattern:'pull', bw:true, target:'3 x 10-15', goalFit:['general','fatloss'], avoidIf:[] },
+  { name:'TRX row', equipment:['trx'], muscle:'back', pattern:'pull', bw:true, target:'3 x 12-15', goalFit:['general','hypertrophy','endurance'], avoidIf:[] },
+
+  /* ============ BICEPS ============ */
+  { name:'EZ bar curl', equipment:['ez-bar'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','strength'], avoidIf:['elbow','wrist'] },
+  { name:'Barbell curl', equipment:['barbell'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 8-10', goalFit:['hypertrophy','strength'], avoidIf:['elbow','wrist'] },
+  { name:'DB curl', equipment:['dumbbell'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','general'], avoidIf:['elbow'] },
+  { name:'Hammer curl', equipment:['dumbbell'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy'], avoidIf:['elbow'] },
+  { name:'Incline DB curl', equipment:['dumbbell','bench'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 12', goalFit:['hypertrophy'], avoidIf:['elbow'] },
+  { name:'Concentration curl', equipment:['dumbbell','bench'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 12 / arm', goalFit:['hypertrophy'], avoidIf:['elbow'] },
+  { name:'Preacher curl', equipment:['machine'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy'], avoidIf:['elbow'] },
+  { name:'EZ bar preacher curl', equipment:['machine','ez-bar'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','strength'], avoidIf:['elbow','wrist'] },
+  { name:'Cable curl', equipment:['cable'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','general'], avoidIf:['elbow'] },
+  { name:'Cable hammer curl', equipment:['cable'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'], avoidIf:['elbow'] },
+  { name:'Cable reverse curl', equipment:['cable'], muscle:'biceps', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'], avoidIf:['elbow','wrist'] },
+
+  /* ============ TRICEPS ============ */
+  { name:'Close-grip bench press', equipment:['barbell','bench'], muscle:'triceps', pattern:'push', bw:false, target:'3 x 8-10', goalFit:['strength','hypertrophy'], avoidIf:['elbow','wrist'] },
+  { name:'EZ bar skull crusher', equipment:['ez-bar','bench'], muscle:'triceps', pattern:'isolation', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','strength'], avoidIf:['elbow','wrist'] },
+  { name:'Cable triceps pushdown', equipment:['cable'], muscle:'triceps', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','general'], avoidIf:['elbow'] },
+  { name:'Rope triceps pushdown', equipment:['cable'], muscle:'triceps', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy','general'], avoidIf:['elbow'] },
+  { name:'Cable overhead triceps extension', equipment:['cable'], muscle:'triceps', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'], avoidIf:['elbow','shoulder'] },
+  { name:'Overhead triceps extension (DB)', equipment:['dumbbell'], muscle:'triceps', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'], avoidIf:['elbow'] },
+  { name:'DB kickback', equipment:['dumbbell'], muscle:'triceps', pattern:'isolation', bw:false, target:'3 x 12-15', goalFit:['hypertrophy'], avoidIf:['elbow'] },
+  { name:'Bench dip', equipment:['bench'], muscle:'triceps', pattern:'push', bw:true, target:'3 x 10-15', goalFit:['general','hypertrophy'], avoidIf:['shoulder','elbow'] },
+  { name:'Smith machine close-grip press', equipment:['smith','bench'], muscle:'triceps', pattern:'push', bw:false, target:'3 x 10-12', goalFit:['hypertrophy','general'], avoidIf:['elbow'] },
+  { name:'TRX triceps extension', equipment:['trx'], muscle:'triceps', pattern:'isolation', bw:true, target:'3 x 12-15', goalFit:['general','hypertrophy'], avoidIf:['elbow'] },
+
+  /* ============ CORE ============ */
+  { name:'Plank', equipment:[], muscle:'core', pattern:'core', bw:true, target:'3 rounds', goalFit:['general','fatloss','endurance'], avoidIf:['wrist'] },
+  { name:'Cable crunch', equipment:['cable'], muscle:'core', pattern:'core', bw:false, target:'3 x 15-20', goalFit:['hypertrophy','general'], avoidIf:['lower-back'] },
+  { name:'Cable woodchop', equipment:['cable'], muscle:'core', pattern:'core', bw:false, target:'3 x 12 / side', goalFit:['general','strength','fatloss'], avoidIf:['lower-back'] },
+  { name:'Pallof press', equipment:['cable'], muscle:'core', pattern:'core', bw:false, target:'3 x 12 / side', goalFit:['general','strength'], avoidIf:[] },
+  { name:'Hanging knee raise', equipment:['pull-up-bar'], muscle:'core', pattern:'core', bw:true, target:'3 x 15-20', goalFit:['general','hypertrophy'], avoidIf:['shoulder','lower-back'] },
+  { name:'Hanging leg raise', equipment:['pull-up-bar'], muscle:'core', pattern:'core', bw:true, target:'3 x 12-15', goalFit:['hypertrophy','general'], avoidIf:['shoulder','lower-back'] },
+  { name:'Farmer carry', equipment:['dumbbell'], muscle:'core', pattern:'carry', bw:true, target:'3 rounds', goalFit:['strength','general','fatloss'], avoidIf:['lower-back'] },
+  { name:'Dead bug', equipment:[], muscle:'core', pattern:'core', bw:true, target:'3 x 12', goalFit:['general','fatloss'], avoidIf:[] },
+  { name:'Russian twist', equipment:['medicine-ball'], muscle:'core', pattern:'core', bw:false, target:'3 x 20', goalFit:['general','fatloss'], avoidIf:['lower-back'] },
+  { name:'Medicine ball slam', equipment:['medicine-ball'], muscle:'core', pattern:'conditioning', bw:false, target:'3 x 12-15', goalFit:['fatloss','endurance'], avoidIf:['lower-back','shoulder'] },
+  { name:'TRX plank', equipment:['trx'], muscle:'core', pattern:'core', bw:true, target:'3 x 30-45 sec', goalFit:['general','endurance'], avoidIf:['shoulder'] },
+  { name:'Mountain climbers', equipment:[], muscle:'core', pattern:'core', bw:true, target:'3 x 20', goalFit:['fatloss','endurance'], avoidIf:['wrist','shoulder'] },
+  { name:'Back extension (core)', equipment:['hyperextension'], muscle:'core', pattern:'core', bw:true, target:'3 x 12-15', goalFit:['general','strength'], avoidIf:['lower-back'] },
+
+  /* ============ CONDITIONING ============ */
+  { name:'Burpees', equipment:[], muscle:'core', pattern:'conditioning', bw:true, target:'3 x 12-15', goalFit:['fatloss','endurance'], avoidIf:['knee','shoulder','lower-back'] },
+  { name:'Jump rope', equipment:['jump-rope'], muscle:'core', pattern:'conditioning', bw:true, target:'5 x 1 min', goalFit:['fatloss','endurance'], avoidIf:['knee'] },
+  { name:'Battle ropes', equipment:['battle-ropes'], muscle:'core', pattern:'conditioning', bw:true, target:'4 x 30 sec', goalFit:['fatloss','endurance'], avoidIf:['shoulder'] },
+  { name:'Box jump', equipment:['plyo-box'], muscle:'legs', pattern:'conditioning', bw:true, target:'4 x 8-10', goalFit:['fatloss','endurance'], avoidIf:['knee'] },
+  { name:'Rowing machine intervals', equipment:['cardio'], muscle:'core', pattern:'conditioning', bw:true, target:'5 x 500m', goalFit:['fatloss','endurance'], avoidIf:['lower-back'] },
+  { name:'Treadmill intervals', equipment:['cardio'], muscle:'legs', pattern:'conditioning', bw:true, target:'6 x 1 min', goalFit:['fatloss','endurance'], avoidIf:['knee'] },
+  { name:'Stair climber', equipment:['cardio'], muscle:'legs', pattern:'conditioning', bw:true, target:'15-20 min', goalFit:['fatloss','endurance'], avoidIf:['knee'] },
+  { name:'Elliptical intervals', equipment:['cardio'], muscle:'legs', pattern:'conditioning', bw:true, target:'20 min', goalFit:['fatloss','endurance'], avoidIf:[] },
+  { name:'Spin bike intervals', equipment:['cardio'], muscle:'legs', pattern:'conditioning', bw:true, target:'8 x 30 sec', goalFit:['fatloss','endurance'], avoidIf:[] },
 ];
 
 const SPLIT_TEMPLATES = {
   2: [
-    { name:'Full body A', muscles:['legs','chest','back','core'] },
-    { name:'Full body B', muscles:['legs','shoulders','back','glutes'] },
+    { name:'Upper', muscles:['chest','back','shoulders','biceps','triceps'] },
+    { name:'Lower', muscles:['legs','glutes','calves','core'] },
   ],
   3: [
-    { name:'Full body A', muscles:['legs','chest','back'] },
-    { name:'Full body B', muscles:['legs','shoulders','back','core'] },
-    { name:'Full body C', muscles:['glutes','chest','biceps','triceps'] },
+    { name:'Push', muscles:['chest','shoulders','triceps'], preferPattern:['push','isolation'] },
+    { name:'Pull', muscles:['back','biceps'], preferPattern:['pull','isolation'] },
+    { name:'Legs', muscles:['legs','glutes','calves'] },
   ],
   4: [
-    { name:'Lower body A', muscles:['legs','glutes','calves'] },
-    { name:'Upper push', muscles:['chest','shoulders','triceps'] },
-    { name:'Lower body B', muscles:['legs','glutes','core'] },
-    { name:'Upper pull', muscles:['back','biceps','shoulders'] },
+    { name:'Push', muscles:['chest','shoulders','triceps'], preferPattern:['push','isolation'] },
+    { name:'Pull', muscles:['back','biceps'], preferPattern:['pull','isolation'] },
+    { name:'Legs', muscles:['legs','glutes','calves'] },
+    { name:'Upper', muscles:['chest','back','shoulders','core'] },
   ],
   5: [
-    { name:'Lower body A', muscles:['legs','glutes','calves'] },
-    { name:'Upper push', muscles:['chest','shoulders','triceps'] },
-    { name:'Lower body B', muscles:['legs','glutes','core'] },
-    { name:'Upper pull', muscles:['back','biceps','shoulders'] },
-    { name:'Full body & focus', muscles:['glutes','core','legs'] },
+    { name:'Push', muscles:['chest','shoulders','triceps'], preferPattern:['push','isolation'] },
+    { name:'Pull', muscles:['back','biceps'], preferPattern:['pull','isolation'] },
+    { name:'Legs', muscles:['legs','glutes','calves'] },
+    { name:'Upper', muscles:['chest','back','shoulders','core'] },
+    { name:'Lower', muscles:['legs','glutes','core'] },
   ],
   6: [
-    { name:'Push A', muscles:['chest','shoulders','triceps'] },
-    { name:'Pull A', muscles:['back','biceps'] },
+    { name:'Push A', muscles:['chest','shoulders','triceps'], preferPattern:['push','isolation'] },
+    { name:'Pull A', muscles:['back','biceps'], preferPattern:['pull','isolation'] },
     { name:'Legs A', muscles:['legs','glutes','calves'] },
-    { name:'Push B', muscles:['chest','shoulders','triceps'] },
-    { name:'Pull B', muscles:['back','biceps'] },
+    { name:'Push B', muscles:['chest','shoulders','triceps'], preferPattern:['push','isolation'] },
+    { name:'Pull B', muscles:['back','biceps'], preferPattern:['pull','isolation'] },
     { name:'Legs B', muscles:['legs','glutes','core'] },
   ],
 };
@@ -690,28 +826,85 @@ function exerciseFitsEquipment(ex, available){
   return ex.equipment.every(eq => available.includes(eq));
 }
 
-function pickExercisesForDay(muscles, equipment, goal, focusMuscle, usedNamesByMuscle, perMuscleCount){
+function exerciseSafeForInjuries(ex, injuries){
+  if(!injuries || injuries.length === 0) return true;
+  const avoidList = ex.avoidIf || [];
+  return !injuries.some(inj => avoidList.includes(inj));
+}
+
+// Strips equipment/grip qualifiers so near-duplicates ("Leg press" vs "Narrow-stance leg press",
+// "Cable triceps pushdown" vs "Rope triceps pushdown") collapse to the same movement family.
+function movementFamily(name){
+  return name.toLowerCase()
+    .replace(/\([^)]*\)/g, '')
+    .replace(/\b(barbell|dumbbell|db|kb|kettlebell|ez bar|cable|rope|smith machine|smith|machine|trx|banded|band|medicine ball|bodyweight)\b/g, '')
+    .replace(/\b(wide|close|narrow|reverse|standing|seated|lying|incline|decline|single|leg|arm|grip|stance|supported|assisted|chest)\b/g, '')
+    .replace(/[^a-z]/g, '')
+    .trim();
+}
+
+function pickExercisesForDay(muscles, equipment, goal, focusMuscle, usedNamesByMuscle, perMuscleCount, injuries, preferPattern){
   const picks = [];
+  const dayFamilies = new Set(); // avoid two variants of the same movement in one day
+
   muscles.forEach(muscle => {
     const usedForThisMuscle = usedNamesByMuscle.get(muscle) || new Set();
-    let candidates = EXERCISE_DB.filter(ex =>
+
+    const baseFilter = (ex, applyGoal, applyUsed) =>
       ex.muscle === muscle &&
       exerciseFitsEquipment(ex, equipment) &&
-      ex.goalFit.includes(goal) &&
-      !usedForThisMuscle.has(ex.name)
-    );
-    if(candidates.length === 0){
-      candidates = EXERCISE_DB.filter(ex =>
-        ex.muscle === muscle &&
-        exerciseFitsEquipment(ex, equipment) &&
-        ex.goalFit.includes(goal)
-      );
-    }
-    const patternPriority = { squat:0, hinge:0, push:0, pull:0, lunge:1, carry:1, isolation:2, core:2, conditioning:2 };
-    candidates.sort((a,b) => (patternPriority[a.pattern]??3) - (patternPriority[b.pattern]??3));
+      exerciseSafeForInjuries(ex, injuries) &&
+      (!applyGoal || ex.goalFit.includes(goal)) &&
+      (!applyUsed || !usedForThisMuscle.has(ex.name));
+
+    let candidates = EXERCISE_DB.filter(ex => baseFilter(ex, true, true));
+    if(candidates.length === 0) candidates = EXERCISE_DB.filter(ex => baseFilter(ex, true, false));
+    if(candidates.length === 0) candidates = EXERCISE_DB.filter(ex => baseFilter(ex, false, false));
+
+    const compoundRank = { squat:0, hinge:0, push:0, pull:0, lunge:1, carry:1, isolation:2, core:2, conditioning:3 };
+    candidates.sort((a,b) => {
+      // Honour the day's preferred patterns first (a pull day shouldn't program overhead presses)
+      if(preferPattern){
+        const aPref = preferPattern.includes(a.pattern) ? 0 : 1;
+        const bPref = preferPattern.includes(b.pattern) ? 0 : 1;
+        if(aPref !== bPref) return aPref - bPref;
+      }
+      return (compoundRank[a.pattern]??4) - (compoundRank[b.pattern]??4);
+    });
 
     const count = (focusMuscle && muscle === focusMuscle) ? perMuscleCount + 1 : perMuscleCount;
-    candidates.slice(0, count).forEach(ex => {
+    const chosen = [];
+    const usedPatterns = new Set();
+
+    // Pass 1: one exercise per movement family AND per pattern — maximises variety
+    for(const ex of candidates){
+      if(chosen.length >= count) break;
+      const fam = movementFamily(ex.name);
+      if(dayFamilies.has(fam) || usedPatterns.has(ex.pattern)) continue;
+      chosen.push(ex);
+      dayFamilies.add(fam);
+      usedPatterns.add(ex.pattern);
+    }
+    // Pass 2: still short — allow pattern repeats but keep families distinct
+    if(chosen.length < count){
+      for(const ex of candidates){
+        if(chosen.length >= count) break;
+        const fam = movementFamily(ex.name);
+        if(dayFamilies.has(fam) || chosen.includes(ex)) continue;
+        chosen.push(ex);
+        dayFamilies.add(fam);
+      }
+    }
+    // Pass 3: last resort — take anything left rather than leave the day thin
+    if(chosen.length < count){
+      for(const ex of candidates){
+        if(chosen.length >= count) break;
+        if(chosen.includes(ex)) continue;
+        chosen.push(ex);
+      }
+    }
+
+    chosen.forEach(ex => {
       picks.push(ex);
       usedForThisMuscle.add(ex.name);
     });
@@ -720,13 +913,14 @@ function pickExercisesForDay(muscles, equipment, goal, focusMuscle, usedNamesByM
   return picks;
 }
 
-function generatePersonalizedProgram({ daysPerWeek, goal, equipment, focusMuscle, experience }){
+function generatePersonalizedProgram({ daysPerWeek, goal, equipment, focusMuscle, experience, injuries }){
   const template = SPLIT_TEMPLATES[daysPerWeek] || SPLIT_TEMPLATES[4];
   const perMuscleCount = experience === 'beginner' ? 1 : 2;
   const usedNamesByMuscle = new Map();
+  const safeInjuries = injuries || [];
 
   return template.map((day, idx) => {
-    const exercises = pickExercisesForDay(day.muscles, equipment, goal, focusMuscle, usedNamesByMuscle, perMuscleCount);
+    const exercises = pickExercisesForDay(day.muscles, equipment, goal, focusMuscle, usedNamesByMuscle, perMuscleCount, safeInjuries, day.preferPattern);
     return {
       id: uid('d'),
       name: day.name,
@@ -1794,22 +1988,41 @@ const WIZARD_QUESTIONS = [
     ]
   },
   {
+    key: 'gymType',
+    question: 'Where do you train?',
+    hint: 'Picking a gym pre-selects its standard equipment — you can fine-tune next.',
+    multi: false,
+    options: [
+      { value:'anytime', label:'Anytime Fitness (or similar gym)' },
+      { value:'home', label:'Home gym' },
+      { value:'custom', label:'Let me pick equipment myself' },
+    ]
+  },
+  {
     key: 'equipment',
-    question: 'What equipment do you have?',
-    hint: 'Select everything available — bodyweight is always included.',
+    question: 'Confirm your equipment',
+    hint: 'Tap to add or remove. Bodyweight exercises are always included.',
     multi: true,
     grid: true,
     options: [
       { value:'dumbbell', label:'Dumbbells' },
-      { value:'barbell', label:'Barbell' },
-      { value:'rack', label:'Squat rack' },
-      { value:'bench', label:'Bench' },
+      { value:'barbell', label:'Barbell + plates' },
+      { value:'rack', label:'Squat / half rack' },
+      { value:'bench', label:'Adjustable bench' },
+      { value:'smith', label:'Smith machine' },
+      { value:'cable', label:'Cable machine' },
+      { value:'machine', label:'Weight machines' },
       { value:'ez-bar', label:'EZ curl bar' },
-      { value:'kettlebell', label:'Kettlebell' },
+      { value:'kettlebell', label:'Kettlebells' },
       { value:'pull-up-bar', label:'Pull-up bar' },
-      { value:'push-up-stands', label:'Push-up stands' },
+      { value:'hyperextension', label:'Back extension' },
+      { value:'trx', label:'TRX straps' },
+      { value:'medicine-ball', label:'Medicine ball' },
+      { value:'plyo-box', label:'Plyo box' },
+      { value:'battle-ropes', label:'Battle ropes' },
       { value:'band', label:'Resistance bands' },
-      { value:'machine', label:'Gym machines' },
+      { value:'cardio', label:'Cardio machines' },
+      { value:'push-up-stands', label:'Push-up stands' },
       { value:'jump-rope', label:'Jump rope' },
     ]
   },
@@ -1827,6 +2040,21 @@ const WIZARD_QUESTIONS = [
       { value:'back', label:'Back' },
       { value:'shoulders', label:'Shoulders' },
       { value:'biceps', label:'Arms' },
+    ]
+  },
+  {
+    key: 'injuries',
+    question: 'Any injuries or areas to avoid?',
+    hint: 'Exercises that stress these areas will be excluded from your program.',
+    multi: true,
+    grid: true,
+    optional: true,
+    options: [
+      { value:'knee', label:'Knees' },
+      { value:'lower-back', label:'Lower back' },
+      { value:'shoulder', label:'Shoulders' },
+      { value:'elbow', label:'Elbows / wrists' },
+      { value:'wrist', label:'Wrists' },
     ]
   },
 ];
@@ -1862,6 +2090,18 @@ function startWizard(){
   render();
 }
 
+// Standard equipment loadouts. 'anytime' mirrors the typical Anytime Fitness floor:
+// half/full racks, Smith machine, full selectorized circuit, cables, free weights and a functional turf area.
+const GYM_PRESETS = {
+  anytime: [
+    'dumbbell','barbell','rack','bench','smith','cable','machine','ez-bar',
+    'kettlebell','pull-up-bar','hyperextension','trx','medicine-ball',
+    'plyo-box','battle-ropes','band','cardio'
+  ],
+  home: ['dumbbell','bench','pull-up-bar','band','push-up-stands','kettlebell'],
+  custom: [],
+};
+
 function wizardSelect(key, value, multi){
   if(multi){
     const arr = wizardAnswers[key] || [];
@@ -1870,6 +2110,10 @@ function wizardSelect(key, value, multi){
     wizardAnswers[key] = arr;
   }else{
     wizardAnswers[key] = value;
+    // Choosing a gym type pre-fills the equipment list so the next step is a quick confirm.
+    if(key === 'gymType'){
+      wizardAnswers.equipment = [...(GYM_PRESETS[value] || [])];
+    }
   }
   renderWizard();
 }
@@ -2003,6 +2247,7 @@ async function finishWizard(){
     equipment,
     focusMuscle: wizardAnswers.focusMuscle || null,
     experience: wizardAnswers.experience || 'intermediate',
+    injuries: wizardAnswers.injuries || [],
   });
 
   const elapsed = Date.now() - startTime;
