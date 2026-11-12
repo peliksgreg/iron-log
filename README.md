@@ -12,3 +12,9 @@ The app also gives you a weekly progress view showing how many of your program d
 
 **Track on the Go**
 For persistence, everything saves locally in the browser by default, with optional Google Drive sync (via OAuth) so your program, history, and header text follow you across devices. There's also a click-to-edit header for naming the app yourself, and a unit toggle that displays everything in lb or kg without touching how data is actually stored internally.
+
+**Rest Timer**
+A rest countdown starts automatically when you enter reps for a set, or you can start it with the ⏱ Rest button on any exercise. Pick 1:00, 1:30, 2:00 or 3:00 (your choice is remembered), nudge it ±15 seconds, or skip. When it ends the phone vibrates and beeps. Auto-start can be turned off from the timer itself.
+
+**Backup & Restore**
+From the History tab you can export everything (program, history, header, unit) to a `.json` backup file, export your history as a `.csv` spreadsheet, or import a backup. Imports can either merge sessions into your current history or replace everything. No Google account required.
