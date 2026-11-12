@@ -558,6 +558,12 @@
   }
   .rest-start-btn:hover{ color:var(--brass); border-color:var(--brass); }
 
+  .load-default-btn{
+    background:none; border:1px solid var(--border); color:var(--text-dim); border-radius:6px;
+    padding:0.4rem 0.8rem; font-size:0.78rem; cursor:pointer; margin:0 0 0.9rem;
+  }
+  .load-default-btn:hover{ color:var(--brass); border-color:var(--brass); }
+
   /* --- Backup (export / import) --- */
   .backup-card{ background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.85rem 1rem; margin-bottom:1rem; }
   .backup-title{ font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.05em; font-size:0.95rem; margin:0 0 0.2rem; color:var(--brass); }
@@ -612,54 +618,52 @@ const STORAGE_HEADER_KEY = 'workout-header';
 
 const DEFAULT_HEADER = { title: 'Iron log', subtitle: 'Your program, your edits, tracked every session' };
 
+// Weekly schedule: Sun Push · Mon Legs · Tue Pull · Wed basketball · Thu badminton or rest · Fri Light · Sat basketball.
+// rest = rest timer length in seconds (restLabel is what's shown); start/startMax = suggested starting weight in kg.
 const DEFAULT_PROGRAM = [
-  { id:'d1', name:'Push A', sub:'Chest, shoulders & triceps', exercises:[
-    { id:'bp',  name:'Barbell bench press',     target:'4 x 6-10', bw:false },
-    { id:'ohp', name:'DB shoulder press',       target:'3 x 10-12', bw:false },
-    { id:'idb', name:'Incline DB press',        target:'3 x 10-12', bw:false },
-    { id:'lr',  name:'Lateral raise',           target:'3 x 12-15', bw:false },
-    { id:'pd',  name:'Cable triceps pushdown',  target:'3 x 12-15', bw:false },
-    { id:'sc',  name:'EZ bar skull crusher',    target:'3 x 10-12', bw:false }
+  { id:'sun-push', name:'Sun – Push', sub:'Chest, shoulders & triceps', exercises:[
+    { id:'sp-idb', name:'Incline DB press',          target:'3 x 6-10',  bw:false, rest:120, restLabel:'2 min',   start:25 },
+    { id:'sp-fdb', name:'Flat DB press',             target:'3 x 6-10',  bw:false, rest:120, restLabel:'2 min',   start:25 },
+    { id:'sp-ohp', name:'Seated DB overhead press',  target:'3 x 8-10',  bw:false, rest:120, restLabel:'2 min',   start:12.5, startMax:15 },
+    { id:'sp-lr',  name:'Lateral raise',             target:'3 x 12-15', bw:false, rest:90,  restLabel:'60–90 s', start:7.5 },
+    { id:'sp-tpd', name:'Triceps pushdown',          target:'3 x 10-12', bw:false, rest:90,  restLabel:'60–90 s', start:15 }
   ]},
-  { id:'d2', name:'Pull A', sub:'Back & biceps', exercises:[
-    { id:'plu', name:'Pull-up',                 target:'4 x AMRAP', bw:true },
-    { id:'row', name:'Barbell row',             target:'4 x 8-10', bw:false },
-    { id:'lpd', name:'Lat pulldown',            target:'3 x 10-12', bw:false },
-    { id:'fp',  name:'Cable face pull',         target:'3 x 15-20', bw:false },
-    { id:'cur', name:'EZ bar curl',             target:'3 x 10-12', bw:false },
-    { id:'hc',  name:'Hammer curl',             target:'3 x 10-12', bw:false }
+  { id:'mon-legs', name:'Mon – Legs', sub:'Quads, hamstrings & calves', exercises:[
+    { id:'ml-sq',  name:'Barbell squat',             target:'3 x 8',     bw:false, rest:180, restLabel:'2–3 min', start:62.5 },
+    { id:'ml-rdl', name:'Romanian deadlift',         target:'3 x 8-10',  bw:false, rest:120, restLabel:'2 min',   start:40 },
+    { id:'ml-lc',  name:'Seated leg curl',           target:'3 x 10-12', bw:false, rest:90,  restLabel:'90 s',    start:61 },
+    { id:'ml-le',  name:'Leg extension',             target:'3 x 10-12', bw:false, rest:90,  restLabel:'90 s',    start:68 },
+    { id:'ml-cr',  name:'Calf raise',                target:'3 x 15-20', bw:false, rest:60,  restLabel:'60 s',    start:20 }
   ]},
-  { id:'d3', name:'Legs A', sub:'Quad & calf focus', exercises:[
-    { id:'sq',  name:'Barbell back squat',      target:'4 x 6-10', bw:false },
-    { id:'lp',  name:'Leg press',               target:'4 x 10-12', bw:false },
-    { id:'le',  name:'Leg extension',           target:'3 x 12-15', bw:false },
-    { id:'wl',  name:'Walking lunge',           target:'3 x 12 / leg', bw:false },
-    { id:'cr',  name:'Calf raise machine',      target:'4 x 15-20', bw:false }
+  { id:'tue-pull', name:'Tue – Pull', sub:'Back & biceps · Wed: basketball · Thu: badminton or rest', exercises:[
+    { id:'tp-pu',  name:'Pull-up',                   target:'3 x 8-12',  bw:true,  rest:120, restLabel:'2 min' },
+    { id:'tp-lpd', name:'Wide lat pulldown',         target:'3 x 8-12',  bw:false, rest:120, restLabel:'2 min',   start:33.5 },
+    { id:'tp-row', name:'Seated row',                target:'3 x 10-12', bw:false, rest:120, restLabel:'2 min',   start:25 },
+    { id:'tp-rdf', name:'Rear-delt fly',             target:'3 x 12-15', bw:false, rest:90,  restLabel:'60–90 s', start:5 },
+    { id:'tp-cur', name:'Bicep curl',                target:'3 x 8-12',  bw:false, rest:90,  restLabel:'60–90 s', start:10 }
   ]},
-  { id:'d4', name:'Push B', sub:'Shoulders, chest & triceps', exercises:[
-    { id:'ohp2',name:'Barbell overhead press',  target:'4 x 6-8', bw:false },
-    { id:'idb2',name:'Incline barbell bench press', target:'3 x 8-10', bw:false },
-    { id:'pec', name:'Pec deck machine',        target:'3 x 12-15', bw:false },
-    { id:'lr2', name:'Cable lateral raise',     target:'3 x 12-15', bw:false },
-    { id:'oht', name:'Overhead triceps extension (DB)', target:'3 x 12-15', bw:false },
-    { id:'dip', name:'Bench dip',               target:'3 x 10-15', bw:true }
-  ]},
-  { id:'d5', name:'Pull B', sub:'Back & biceps', exercises:[
-    { id:'row2',name:'Seated cable row',        target:'4 x 10-12', bw:false },
-    { id:'lpd2',name:'Wide-grip lat pulldown',  target:'3 x 10-12', bw:false },
-    { id:'cir', name:'Chest-supported DB row',  target:'3 x 10-12', bw:false },
-    { id:'sap', name:'Cable straight-arm pulldown', target:'3 x 12-15', bw:false },
-    { id:'idc', name:'Incline DB curl',         target:'3 x 12', bw:false },
-    { id:'ccr', name:'Cable curl',              target:'3 x 12-15', bw:false }
-  ]},
-  { id:'d6', name:'Legs B', sub:'Hamstring, glute & core focus', exercises:[
-    { id:'rdl', name:'Barbell Romanian deadlift', target:'3 x 8-10', bw:false },
-    { id:'ht',  name:'Barbell hip thrust',      target:'4 x 8-12', bw:false },
-    { id:'lc',  name:'Lying leg curl',          target:'3 x 12-15', bw:false },
-    { id:'bss', name:'Bulgarian split squat',   target:'3 x 10-12 / leg', bw:false },
-    { id:'hkr', name:'Hanging knee raise',      target:'3 x 15-20', bw:true }
+  { id:'fri-light', name:'Fri – Light', sub:'Lighter full-body session · Sat: basketball', exercises:[
+    { id:'fl-idb', name:'Incline DB press',          target:'3 x 8-10',  bw:false, rest:120, restLabel:'2 min',   start:22.5 },
+    { id:'fl-row', name:'Seated row',                target:'3 x 10-12', bw:false, rest:120, restLabel:'2 min',   start:25 },
+    { id:'fl-pu',  name:'Pull-up',                   target:'2 x submax', bw:true, rest:120, restLabel:'2 min' },
+    { id:'fl-lr',  name:'Lateral raise',             target:'3 x 12-15', bw:false, rest:90,  restLabel:'60–90 s', start:7.5 },
+    { id:'fl-bss', name:'Bulgarian split squat',     target:'2 x 8 / leg', bw:true, rest:90,  restLabel:'90 s' }
   ]}
 ];
+
+function formatStartWeight(ex){
+  if(!ex || !(ex.start > 0)) return '';
+  const conv = kg => weightUnit === 'kg' ? kg : Math.round(kgToLb(kg) * 2) / 2;
+  return conv(ex.start) + (ex.startMax ? '–' + conv(ex.startMax) : '') + weightUnit;
+}
+
+function findExerciseById(exId){
+  for(const d of program){
+    const ex = d.exercises.find(e => e.id === exId);
+    if(ex) return ex;
+  }
+  return null;
+}
 
 /* ---------- Personalization engine ---------- */
 
@@ -993,7 +997,7 @@ function generatePersonalizedProgram({ daysPerWeek, goal, equipment, focusMuscle
 let program = [];
 let history = [];
 let appHeader = { ...DEFAULT_HEADER };
-let weightUnit = 'lb';
+let weightUnit = 'kg';
 let currentDayId = null;
 
 function lbToKg(lb){ return lb / 2.20462; }
@@ -1477,12 +1481,16 @@ function selectEdit(){
 function addSet(exId){ rows[exId].push({ weight:'', reps:'' }); render(); }
 function removeSet(exId, idx){ if(rows[exId].length > 1) rows[exId].splice(idx,1); render(); }
 function updateField(exId, idx, field, value){
+  if(!rows[exId] || !rows[exId][idx]) return; // input from a view that was just replaced
   if(field === 'weight'){
     rows[exId][idx][field] = fromDisplayWeight(value);
   }else{
     const hadReps = rows[exId][idx].reps !== '' && rows[exId][idx].reps != null;
     rows[exId][idx][field] = value;
-    if(field === 'reps' && value !== '' && !hadReps && restAuto) startRestTimer();
+    if(field === 'reps' && value !== '' && !hadReps && restAuto){
+      const ex = findExerciseById(exId);
+      startRestTimer(ex && ex.rest);
+    }
   }
 }
 
@@ -1551,7 +1559,8 @@ function renderLog(){
 
   day.exercises.forEach(ex => {
     const last = lastSessionFor(currentDayId, ex);
-    let lastText = 'No previous session logged';
+    const startText = formatStartWeight(ex);
+    let lastText = startText ? `No previous session \u2014 suggested start: ${startText}${ex.bw ? ' added' : ''}` : 'No previous session logged';
     if(last && last.length){
       lastText = 'Last time: ' + last.map(s => ex.bw ? `${s.reps} reps${s.weight ? ' +'+toDisplayWeight(s.weight)+weightUnit:''}` : `${toDisplayWeight(s.weight)}${weightUnit} x ${s.reps}`).join(', ');
     }
@@ -1566,7 +1575,7 @@ function renderLog(){
         <span class="ex-name">${escapeHtml(ex.name)}</span>
         <span class="pr-badge" id="pr-${ex.id}">PR</span>
         <button class="demo-btn" data-exname="${escapeHtml(ex.name)}" onclick="showExerciseDemo(this.dataset.exname)">&#9654; How to</button>
-        <span class="ex-target">${escapeHtml(ex.target)}</span>
+        <span class="ex-target">${escapeHtml(ex.target)}${ex.restLabel ? ' · rest ' + escapeHtml(ex.restLabel) : ''}</span>
       </div>
       <p class="last-time">${lastText}</p>
       ${suggestionHtml}`;
@@ -1574,7 +1583,7 @@ function renderLog(){
     (rows[ex.id] || [{weight:'',reps:''}]).forEach((row,idx) => {
       html += `<div class="set-row">
         <span class="set-num">${idx+1}</span>
-        <input type="number" inputmode="decimal" placeholder="${ex.bw ? 'added wt' : 'weight'}" value="${toDisplayWeight(row.weight)}" step="2.5"
+        <input type="number" inputmode="decimal" placeholder="${!last && ex.start ? (weightUnit === 'kg' ? ex.start : Math.round(kgToLb(ex.start) * 2) / 2) : (ex.bw ? 'added wt' : 'weight')}" value="${toDisplayWeight(row.weight)}" step="2.5"
           onchange="updateField('${ex.id}', ${idx}, 'weight', this.value)">
         <span class="unit">${weightUnit}</span>
         <input type="number" inputmode="numeric" placeholder="reps" value="${row.reps}"
@@ -1587,7 +1596,7 @@ function renderLog(){
     html += `<div class="row-actions">
         <div>
           <button class="add-set" onclick="addSet('${ex.id}')">+ Add set</button>
-          <button class="rest-start-btn" onclick="startRestTimer()" aria-label="Start rest timer">&#9201; Rest</button>
+          <button class="rest-start-btn" onclick="startRestTimer(${ex.rest || 0})" aria-label="Start rest timer">&#9201; Rest</button>
         </div>
         <div class="tally">${renderTally((rows[ex.id]||[]).filter(r=>r.weight!=='' || r.reps!=='').length)}</div>
       </div>
@@ -1756,6 +1765,7 @@ async function deleteSession(sessId){
 function renderEdit(){
   let html = `<h2 class="day-head">Edit program</h2>
     <p class="day-sub">Drag to reorder days and exercises. Nothing is saved until you tap "Save changes".</p>
+    <button class="load-default-btn" onclick="loadDefaultIntoEditor()">&#8635; Load default plan</button>
     <div class="day-pills" id="day-pills"></div>`;
 
   const activeDay = editingProgram.find(d => d.id === (currentDayId || (editingProgram[0] && editingProgram[0].id)));
@@ -1899,6 +1909,14 @@ function deleteDay(e, id){
   if(currentDayId === id) currentDayId = editingProgram[0].id;
   markEditDirty();
   render();
+}
+
+function loadDefaultIntoEditor(){
+  if(!confirm('Replace the program in the editor with the default Push / Legs / Pull / Light plan? Your history is kept. Tap "Save changes" afterwards to apply it.')) return;
+  editingProgram = JSON.parse(JSON.stringify(DEFAULT_PROGRAM));
+  currentDayId = editingProgram[0].id;
+  render();
+  markEditDirty();
 }
 
 function addExercise(dayId){
@@ -3031,7 +3049,7 @@ function renderRestTimer(){
     </div>
     <div class="rest-bar"><div class="rest-bar-fill" id="rest-bar-fill" style="width:${done ? 0 : (remaining / restTotal) * 100}%"></div></div>
     <div class="rest-bottom">
-      ${REST_PRESETS.map(s => `<button class="rest-chip ${s === restDefault ? 'active' : ''}" onclick="setRestDefault(${s})">${formatRest(s)}</button>`).join('')}
+      ${REST_PRESETS.map(s => `<button class="rest-chip ${s === restTotal ? 'active' : ''}" onclick="setRestDefault(${s})">${formatRest(s)}</button>`).join('')}
       <label class="rest-auto"><input type="checkbox" ${restAuto ? 'checked' : ''} onchange="toggleRestAuto(this.checked)"> Auto-start</label>
     </div>`;
 }
@@ -3202,14 +3220,9 @@ async function applyImport(mode){
   if(!currentDayId && program.length) currentDayId = program[0].id;
   resetRows();
 
-  const wizardAlreadyRun = localStorage.getItem('wizard-completed') === '1';
-
-  if(!wizardAlreadyRun){
-    startWizard();
-  }else{
-    currentView = 'dashboard';
-    render();
-  }
+  // First launch opens the default plan; the Personalize wizard is available from its tab.
+  currentView = history.length ? 'dashboard' : 'log';
+  render();
 
   setSyncStatus('');
   if(localStorage.getItem('gdrive-connected') === '1'){
