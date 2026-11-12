@@ -489,6 +489,46 @@
     font-size:0.95rem; padding:0.85rem 1.5rem; border-radius:8px; cursor:pointer;
     margin-top:1.25rem; text-align:center;
   }
+
+  /* Today + consistency */
+  .dash-today-btn{ margin:0 0 1rem; }
+  .dash-today{
+    display:flex; flex-direction:column; gap:0.15rem; background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:0.75rem 1rem; margin-bottom:1rem;
+  }
+  .dash-today-head{ font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.05em; font-size:0.95rem; }
+  .dash-today-next{ font-size:0.8rem; color:var(--text-dim); }
+  .dash-meter{ height:6px; background:var(--surface-2); border-radius:3px; margin-top:0.45rem; overflow:hidden; }
+  .dash-meter span{ display:block; height:100%; border-radius:3px; background:var(--text-dim); }
+  .dash-meter span.up{ background:var(--brass); }
+  .dash-meter span.down{ background:var(--accent); }
+  .dash-volume-bar.good{ background:var(--brass); }
+  .cal-wrap{ margin-top:0.5rem; }
+  .cal-txt{ font-size:8px; fill:var(--text-dim); font-family:'JetBrains Mono', monospace; }
+  .cal-cell{ cursor:pointer; stroke-width:1.5; pointer-events:all; }
+  .cal-done{ fill:var(--brass); stroke:var(--brass); }
+  .cal-missed{ fill:none; stroke:var(--accent); stroke-dasharray:3 2; }
+  .cal-future-plan{ fill:none; stroke:var(--border); stroke-dasharray:3 2; }
+  .cal-today-plan{ fill:none; stroke:var(--brass); stroke-dasharray:3 2; }
+  .cal-empty{ fill:var(--surface-2); stroke:var(--surface-2); }
+  .cal-future{ fill:none; stroke:none; }
+  .cal-cell.cal-today{ stroke:var(--text); stroke-width:2; stroke-dasharray:none; }
+  .cal-cell.cal-selected{ stroke:var(--text); stroke-width:2.5; stroke-dasharray:none; }
+  .cal-legend{ display:flex; flex-wrap:wrap; gap:0.35rem 0.9rem; margin-top:0.5rem; font-size:0.7rem; color:var(--text-dim); }
+  .cal-legend span{ display:flex; align-items:center; gap:0.3rem; }
+  .cal-key{ width:11px; height:11px; border-radius:3px; display:inline-block; border:1.5px solid transparent; }
+  .cal-key.cal-done{ background:var(--brass); border-color:var(--brass); }
+  .cal-key.cal-missed{ border:1.5px dashed var(--accent); }
+  .cal-key.cal-future-plan{ border:1.5px dashed var(--text-dim); }
+  .cal-key.cal-empty{ background:var(--surface-2); }
+  .cal-info{ font-size:0.78rem; color:var(--text); margin:0.45rem 0 0; min-height:1.2em; }
+  .wk-bar{ fill:var(--accent); }
+  .wk-bar.wk-full{ fill:var(--brass); }
+  .wk-bar.wk-cur{ opacity:0.75; }
+  .wk-zero{ fill:var(--border); }
+  .wk-val{ font-size:9px; fill:var(--text); font-family:'JetBrains Mono', monospace; }
+  .wk-axis{ stroke:var(--border); stroke-width:1; }
+  .wk-target{ stroke:var(--text-dim); stroke-width:1; stroke-dasharray:4 3; }
   .dash-tab{ color:var(--text); }
   .dash-tab.active{ color:var(--bg); background:var(--surface-2); border-color:var(--border); }
 
@@ -1525,24 +1565,7 @@ function updateField(exId, idx, field, value){
   }
 }
 
-function getThisWeekCompletedDayIds(){
-  const now = new Date();
-  const dayOfWeek = now.getDay(); // 0 = Sunday
-  const diffToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
-  const monday = new Date(now);
-  monday.setHours(0,0,0,0);
-  monday.setDate(now.getDate() - diffToMonday);
-
-  const completed = new Set();
-  history.forEach(sess => {
-    const sessDate = new Date(sess.date);
-    if(sessDate >= monday){
-      completed.add(sess.dayId);
-      if(sess.dayName) completed.add('name:' + sess.dayName);
-    }
-  });
-  return completed;
-}
+function getThisWeekCompletedDayIds(){ return completedIdsInWeek(0); }
 
 function isDayCompletedThisWeek(day, completedSet){
   return completedSet.has(day.id) || completedSet.has('name:' + day.name);
@@ -2565,47 +2588,293 @@ let dashChartExIdx = 0; // which exercise to show in the progress chart
 
 function selectDashboard(){ currentView = 'dashboard'; render(); }
 
-function getThisWeekSessions(){
-  const now = new Date();
-  const dayOfWeek = now.getDay();
-  const diffToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
-  const monday = new Date(now);
-  monday.setHours(0,0,0,0);
-  monday.setDate(now.getDate() - diffToMonday);
-  return history.filter(s => new Date(s.date) >= monday);
+/* ---------- Week & schedule helpers ---------- */
+const WEEKDAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat'];
+const WEEKDAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+// 0 = Sunday, 1 = Monday. "auto" starts the week on Sunday when the plan's first day is a Sunday.
+function getWeekStartDay(){
+  if(profile.weekStart === 'sun') return 0;
+  if(profile.weekStart === 'mon') return 1;
+  return (program[0] && dayWeekday(program[0]) === 0) ? 0 : 1;
 }
 
-function getWeekSessionsCount(weeksAgo){
-  const now = new Date();
-  const dayOfWeek = now.getDay();
-  const diffToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
-  const monday = new Date(now);
-  monday.setHours(0,0,0,0);
-  monday.setDate(now.getDate() - diffToMonday - weeksAgo * 7);
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 7);
-  return history.filter(s => { const d = new Date(s.date); return d >= monday && d < sunday; }).length;
+function startOfWeek(weeksAgo, from){
+  const d = from ? new Date(from) : new Date();
+  d.setHours(0,0,0,0);
+  const diff = (d.getDay() - getWeekStartDay() + 7) % 7;
+  d.setDate(d.getDate() - diff - (weeksAgo || 0) * 7);
+  return d;
 }
 
-function getWeekVolume(weeksAgo){
-  const now = new Date();
-  const dayOfWeek = now.getDay();
-  const diff = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
-  const monday = new Date(now);
-  monday.setHours(0,0,0,0);
-  monday.setDate(now.getDate() - diff - weeksAgo * 7);
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 7);
+function weekRange(weeksAgo){
+  const start = startOfWeek(weeksAgo);
+  const end = new Date(start); end.setDate(start.getDate() + 7);
+  return { start, end };
+}
+
+function sessionsInWeek(weeksAgo){
+  const { start, end } = weekRange(weeksAgo);
+  return history.filter(s => { const d = new Date(s.date); return d >= start && d < end; });
+}
+
+// Weekday a program day is scheduled on, read from a "Mon – Legs" style name; null if none.
+function dayWeekday(day){
+  if(!day) return null;
+  if(typeof day.weekday === 'number') return day.weekday;
+  const m = String(day.name || '').trim().toLowerCase().match(/^(sun|mon|tue|wed|thu|fri|sat)/);
+  return m ? WEEKDAY_KEYS.indexOf(m[1]) : null;
+}
+
+function completedIdsInWeek(weeksAgo){
+  const set = new Set();
+  sessionsInWeek(weeksAgo).forEach(sess => {
+    set.add(sess.dayId);
+    if(sess.dayName) set.add('name:' + sess.dayName);
+  });
+  return set;
+}
+
+function plannedDaysDoneInWeek(weeksAgo){
+  const set = completedIdsInWeek(weeksAgo);
+  return program.filter(d => isDayCompletedThisWeek(d, set)).length;
+}
+
+function getThisWeekSessions(){ return sessionsInWeek(0); }
+function getWeekSessionsCount(weeksAgo){ return sessionsInWeek(weeksAgo).length; }
+
+// Volume in stored units (lb). With sameElapsed, only counts up to the same point in that week as now.
+function getWeekVolume(weeksAgo, sameElapsed){
   let vol = 0;
-  history.forEach(sess => {
-    const d = new Date(sess.date);
-    if(d >= monday && d < sunday){
-      Object.values(sess.exercises).forEach(sets => {
-        sets.forEach(s => { vol += s.weight * s.reps; });
-      });
+  const cutoff = sameElapsed ? weekRange(weeksAgo).start.getTime() + (Date.now() - weekRange(0).start.getTime()) : Infinity;
+  sessionsInWeek(weeksAgo).filter(s => new Date(s.date).getTime() <= cutoff).forEach(sess => {
+    Object.values(sess.exercises).forEach(sets => {
+      sets.forEach(s => { vol += (Number(s.weight) || 0) * (Number(s.reps) || 0); });
+    });
+  });
+  return vol;
+}
+
+function formatVolume(lbVol){
+  const v = Math.round(toDisplayWeight(lbVol) || 0);
+  return v >= 1000 ? (v/1000).toFixed(1) + 'k' : String(v);
+}
+
+// Number of weeks (including the current one) since the first logged session.
+function weeksOfHistory(){
+  if(!history.length) return 0;
+  const first = history.reduce((a, s) => new Date(s.date) < a ? new Date(s.date) : a, new Date(history[0].date));
+  const firstWeek = startOfWeek(0, first);
+  return Math.round((startOfWeek(0) - firstWeek) / (7 * 864e5)) + 1;
+}
+
+function getConsistencyStats(){
+  const target = program.length;
+  const histWeeks = weeksOfHistory();
+  const doneByWeek = w => plannedDaysDoneInWeek(w);
+
+  // Adherence over completed weeks (the current week isn't over yet).
+  const adherence = n => {
+    const weeks = Math.min(n, Math.max(histWeeks - 1, 0));
+    if(!weeks || !target) return null;
+    let done = 0;
+    for(let w = 1; w <= weeks; w++) done += Math.min(doneByWeek(w), target);
+    return { pct: Math.round(done / (weeks * target) * 100), weeks, done, possible: weeks * target };
+  };
+
+  // Full weeks = every planned day done. The current week counts once it's full.
+  let currentFull = 0;
+  if(target){
+    if(doneByWeek(0) >= target) currentFull++;
+    for(let w = 1; w < histWeeks; w++){
+      if(doneByWeek(w) >= target) currentFull++; else break;
+    }
+  }
+  let bestFull = 0, run = 0;
+  for(let w = histWeeks - 1; w >= 0; w--){
+    if(target && doneByWeek(w) >= target){ run++; bestFull = Math.max(bestFull, run); }
+    else run = 0;
+  }
+
+  // Weeks in a row with at least one workout (the current week doesn't break it).
+  let activeStreak = 0;
+  for(let w = 0; w < Math.max(histWeeks, 1); w++){
+    if(sessionsInWeek(w).length) activeStreak++;
+    else if(w > 0) break;
+  }
+
+  let daysSince = null;
+  if(history.length){
+    const last = history.reduce((a, s) => new Date(s.date) > a ? new Date(s.date) : a, new Date(0));
+    const a = new Date(); a.setHours(0,0,0,0);
+    const b = new Date(last); b.setHours(0,0,0,0);
+    daysSince = Math.round((a - b) / 864e5);
+  }
+
+  // How often each planned day got done over the last 8 completed weeks.
+  const perDayWeeks = Math.min(8, Math.max(histWeeks - 1, 0));
+  const perDay = program.map(day => {
+    let done = 0;
+    for(let w = 1; w <= perDayWeeks; w++){
+      if(isDayCompletedThisWeek(day, completedIdsInWeek(w))) done++;
+    }
+    return { day, done, weeks: perDayWeeks };
+  });
+
+  return { target, histWeeks, a4: adherence(4), a12: adherence(12), currentFull, bestFull, activeStreak, daysSince, perDay };
+}
+
+/* ---------- Today's plan ---------- */
+function getTodayPlan(){
+  const today = new Date().getDay();
+  const scheduled = program.filter(d => dayWeekday(d) !== null);
+  if(!scheduled.length) return null;
+  const doneSet = completedIdsInWeek(0);
+  const todayDay = scheduled.find(d => dayWeekday(d) === today) || null;
+  let next = null;
+  for(let i = 1; i <= 7 && !next; i++){
+    const wd = (today + i) % 7;
+    const d = scheduled.find(x => dayWeekday(x) === wd);
+    if(d) next = { day: d, inDays: i };
+  }
+  return { todayDay, todayDone: todayDay ? isDayCompletedThisWeek(todayDay, doneSet) : false, next };
+}
+
+/* ---------- Consistency calendar (last 12 weeks + this week) ---------- */
+function renderConsistencyCalendar(){
+  const WEEKS = 13;
+  const weekStart = getWeekStartDay();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const firstSession = history.length ? history.reduce((a, s) => new Date(s.date) < a ? new Date(s.date) : a, new Date(history[0].date)) : today;
+  const trackingStart = startOfWeek(0, firstSession);
+  const sessionsByDate = {};
+  history.forEach(s => {
+    const d = new Date(s.date); d.setHours(0,0,0,0);
+    const key = d.toDateString();
+    (sessionsByDate[key] = sessionsByDate[key] || []).push(s);
+  });
+  const scheduledByWeekday = {};
+  program.forEach(d => { const wd = dayWeekday(d); if(wd !== null) scheduledByWeekday[wd] = d; });
+
+  const CELL = 18, GAP = 4, LABEL_W = 16, TOP = 14;
+  const W = LABEL_W + WEEKS * (CELL + GAP), H = TOP + 7 * (CELL + GAP);
+  let cells = '';
+  let monthLabels = '';
+  let lastMonth = -1;
+  for(let c = 0; c < WEEKS; c++){
+    const colStart = startOfWeek(WEEKS - 1 - c);
+    if(colStart.getMonth() !== lastMonth){
+      lastMonth = colStart.getMonth();
+      monthLabels += `<text x="${LABEL_W + c * (CELL + GAP)}" y="9" class="cal-txt">${colStart.toLocaleDateString(undefined,{month:'short'})}</text>`;
+    }
+    const doneSet = completedIdsInWeek(WEEKS - 1 - c);
+    for(let r = 0; r < 7; r++){
+      const d = new Date(colStart); d.setDate(colStart.getDate() + r);
+      const x = LABEL_W + c * (CELL + GAP), y = TOP + r * (CELL + GAP);
+      const sess = sessionsByDate[d.toDateString()] || [];
+      const planned = scheduledByWeekday[d.getDay()];
+      const dateLabel = d.toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'});
+      let cls, info;
+      if(d > today){
+        cls = planned ? 'cal-future-plan' : 'cal-future';
+        info = planned ? `${dateLabel}: ${planned.name} planned` : `${dateLabel}`;
+      }else if(sess.length){
+        cls = 'cal-done';
+        info = `${dateLabel}: ${sess.map(s => s.dayName || (program.find(p => p.id === s.dayId) || {}).name || 'Workout').join(', ')} ✓`;
+      }else if(planned && !isDayCompletedThisWeek(planned, doneSet) && d < today && d >= trackingStart){
+        cls = 'cal-missed';
+        info = `${dateLabel}: ${planned.name} missed`;
+      }else if(planned && d.getTime() === today.getTime()){
+        cls = 'cal-today-plan';
+        info = `${dateLabel}: ${planned.name} today`;
+      }else{
+        cls = 'cal-empty';
+        info = planned ? `${dateLabel}: ${planned.name} (done another day)` : `${dateLabel}: rest`;
+      }
+      const isToday = d.getTime() === today.getTime();
+      cells += `<rect x="${x}" y="${y}" width="${CELL}" height="${CELL}" rx="4" class="cal-cell ${cls}${isToday ? ' cal-today' : ''}"
+        data-info="${escapeHtml(info)}" onclick="showCalInfo(this)"><title>${escapeHtml(info)}</title></rect>`;
+    }
+  }
+  let rowLabels = '';
+  for(let r = 0; r < 7; r++){
+    const wd = (weekStart + r) % 7;
+    if(r % 2 === 0) rowLabels += `<text x="0" y="${TOP + r * (CELL + GAP) + CELL - 5}" class="cal-txt">${WEEKDAY_NAMES[wd][0]}</text>`;
+  }
+  return `<div class="cal-wrap"><svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W * 1.25}px" role="img" aria-label="Workout calendar for the last ${WEEKS} weeks">
+      ${monthLabels}${rowLabels}${cells}
+    </svg></div>
+    <div class="cal-legend">
+      <span><i class="cal-key cal-done"></i>Workout</span>
+      <span><i class="cal-key cal-missed"></i>Planned, missed</span>
+      <span><i class="cal-key cal-future-plan"></i>Planned</span>
+      <span><i class="cal-key cal-empty"></i>Rest</span>
+    </div>
+    <p class="cal-info" id="cal-info">Tap a day for details.</p>`;
+}
+
+function showCalInfo(el){
+  const out = document.getElementById('cal-info');
+  if(out) out.textContent = el.getAttribute('data-info');
+  document.querySelectorAll('.cal-cell.cal-selected').forEach(c => c.classList.remove('cal-selected'));
+  el.classList.add('cal-selected');
+}
+
+/* ---------- Weekly bars with target line (last 12 weeks) ---------- */
+function renderWeeklyBars(target){
+  const N = 12;
+  const counts = Array.from({length:N}, (_, i) => plannedDaysDoneInWeek(N - 1 - i));
+  const extra = Array.from({length:N}, (_, i) => Math.max(0, sessionsInWeek(N - 1 - i).length - counts[i]));
+  const maxV = Math.max(target, ...counts.map((c, i) => c + extra[i]), 1);
+  const W = 300, H = 120, PL = 4, PR = 4, PT = 14, PB = 18;
+  const slot = (W - PL - PR) / N, bw = Math.min(16, slot - 6);
+  const y = v => PT + (1 - v / maxV) * (H - PT - PB);
+  let bars = '';
+  counts.forEach((c, i) => {
+    const x = PL + i * slot + (slot - bw) / 2;
+    const { start } = weekRange(N - 1 - i);
+    const label = start.toLocaleDateString(undefined,{month:'short', day:'numeric'});
+    const isCur = i === N - 1;
+    const full = target && c >= target;
+    const tip = `Week of ${label}: ${c}/${target} planned days${extra[i] ? ` + ${extra[i]} extra` : ''}${isCur ? ' (in progress)' : ''}`;
+    if(c > 0){
+      const showVal = c < target || !target;
+      bars += `<path d="M${x},${y(0)} V${y(c) + 4} q0,-4 4,-4 h${bw - 8} q4,0 4,4 V${y(0)} Z" class="wk-bar ${full ? 'wk-full' : ''} ${isCur ? 'wk-cur' : ''}"><title>${escapeHtml(tip)}</title></path>`;
+      if(showVal) bars += `<text x="${x + bw/2}" y="${y(c) - 3}" text-anchor="middle" class="wk-val">${c}</text>`;
+    }else{
+      bars += `<rect x="${x}" y="${y(0) - 2}" width="${bw}" height="2" class="wk-zero"><title>${escapeHtml(tip)}</title></rect>`;
+    }
+    bars += `<rect x="${PL + i * slot}" y="${PT}" width="${slot}" height="${H - PT - PB}" fill="transparent"><title>${escapeHtml(tip)}</title></rect>`;
+    if(i % 3 === 2 || isCur){
+      bars += `<text x="${x + bw/2}" y="${H - 4}" text-anchor="middle" class="cal-txt">${isCur ? 'Now' : label}</text>`;
     }
   });
-  return Math.round(vol);
+  const ty = y(target);
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Planned days completed per week">
+      <line x1="${PL}" x2="${W - PR}" y1="${y(0)}" y2="${y(0)}" class="wk-axis"/>
+      ${target ? `<line x1="${PL}" x2="${W - PR}" y1="${ty}" y2="${ty}" class="wk-target"/>
+      <text x="${PL}" y="${ty - 3}" class="cal-txt">all ${target} days</text>` : ''}
+      ${bars}
+    </svg>`;
+}
+
+function calcWeeklyVolume(){
+  // Top 5 exercises by total weight × reps this week
+  const weekSessions = getThisWeekSessions();
+  const vol = {};
+  weekSessions.forEach(sess => {
+    Object.keys(sess.exercises).forEach(key => {
+      const sets = sess.exercises[key];
+      const exMeta = findExerciseMetaByCanonical(key);
+      if(!exMeta || exMeta.bw) return;
+      const name = exMeta ? exMeta.name : key;
+      vol[name] = (vol[name] || 0) + sets.reduce((s,r) => s + r.weight * r.reps, 0);
+    });
+  });
+  return Object.entries(vol)
+    .sort((a,b) => b[1]-a[1])
+    .slice(0, 5)
+    .map(([name, total]) => ({ name, total: Math.round(toDisplayWeight(total)) }));
 }
 
 function getAllTimePRs(){
@@ -2636,8 +2905,12 @@ function getAllTimePRs(){
 
 function getExercisesWithHistory(){
   const result = [];
+  const seen = new Set();
   program.forEach(day => {
     day.exercises.forEach(ex => {
+      const key = canonicalize(ex.name);
+      if(seen.has(key)) return;
+      seen.add(key);
       const sessions = getSessionHistoryFor(ex);
       if(sessions.length >= 2) result.push({ ex, sessions });
     });
@@ -2701,25 +2974,6 @@ function drawChart(sessions, ex){
     </div>`;
 }
 
-function calcWeeklyVolume(){
-  // Top 5 exercises by total weight × reps this week
-  const weekSessions = getThisWeekSessions();
-  const vol = {};
-  weekSessions.forEach(sess => {
-    Object.keys(sess.exercises).forEach(key => {
-      const sets = sess.exercises[key];
-      const exMeta = findExerciseMetaByCanonical(key);
-      if(!exMeta || exMeta.bw) return;
-      const name = exMeta ? exMeta.name : key;
-      vol[name] = (vol[name] || 0) + sets.reduce((s,r) => s + r.weight * r.reps, 0);
-    });
-  });
-  return Object.entries(vol)
-    .sort((a,b) => b[1]-a[1])
-    .slice(0, 5)
-    .map(([name, total]) => ({ name, total: Math.round(toDisplayWeight(total)) }));
-}
-
 function renderDashboard(){
   const weekSessions = getThisWeekSessions();
   const totalDays = program.length;
@@ -2728,42 +2982,16 @@ function renderDashboard(){
   const prs = getAllTimePRs();
   const totalSessions = history.length;
   const exWithHistory = getExercisesWithHistory();
+  const stats = getConsistencyStats();
+  const plan = getTodayPlan();
 
-  // Streak
-  function getStreak(){
-    if(!history.length) return 0;
-    let streak = 0;
-    const now = new Date();
-    for(let w = 0; w < 52; w++){
-      const ws = new Date(now);
-      const diff = (ws.getDay()===0?6:ws.getDay()-1);
-      ws.setHours(0,0,0,0);
-      ws.setDate(ws.getDate()-diff-w*7);
-      const we = new Date(ws); we.setDate(ws.getDate()+7);
-      const has = history.some(s=>{ const d=new Date(s.date); return d>=ws&&d<we; });
-      if(has) streak++;
-      else if(w>0) break;
-    }
-    return streak;
-  }
-  const streak = getStreak();
-
-  // Week comparison
   const thisWeekCount = weekSessions.length;
-  const lastWeekCount = getWeekSessionsCount(1);
-  const sessionDelta = thisWeekCount - lastWeekCount;
-
-  // Total volume this week vs last
   const thisVol = getWeekVolume(0);
-  const lastVol = getWeekVolume(1);
+  const lastVol = getWeekVolume(1, true);
   const volDelta = lastVol > 0 ? Math.round((thisVol - lastVol) / lastVol * 100) : 0;
 
-  // Weekly bar chart (8 weeks)
-  const weekCounts = Array.from({length:8}, (_,i) => getWeekSessionsCount(7-i));
-  const maxWeekCount = Math.max(...weekCounts, 1);
-
   // Ring
-  const pct = totalDays > 0 ? completedCount / totalDays : 0;
+  const pct = totalDays > 0 ? Math.min(completedCount / totalDays, 1) : 0;
   const R=44, CX=52, CY=52, STR=8;
   const circ = 2*Math.PI*R;
   const dash = pct*circ;
@@ -2771,79 +2999,109 @@ function renderDashboard(){
   const ringSvg = `<svg class="dash-ring" width="104" height="104" viewBox="0 0 104 104">
     <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="${STR}"/>
     <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${ringColor}" stroke-width="${STR}"
-      stroke-dasharray="${dash} ${circ}" stroke-dashoffset="${circ/4}" stroke-linecap="round"
+      stroke-dasharray="${dash} ${circ}" stroke-linecap="round"
       transform="rotate(-90 ${CX} ${CY})"/>
     <text x="${CX}" y="${CY-6}" text-anchor="middle" dominant-baseline="central"
       font-family="JetBrains Mono,monospace" font-size="18" font-weight="600" fill="var(--text)">${completedCount}/${totalDays}</text>
     <text x="${CX}" y="${CY+14}" text-anchor="middle" font-family="sans-serif" font-size="9" fill="var(--text-dim)">DAYS</text>
   </svg>`;
 
+  const { start: wkStart, end: wkEnd } = weekRange(0);
+  const wkEndShown = new Date(wkEnd); wkEndShown.setDate(wkEnd.getDate() - 1);
+  const fmt = d => d.toLocaleDateString(undefined,{month:'short', day:'numeric'});
+
   let html = `<h2 class="day-head" style="margin-bottom:1.1rem">Dashboard</h2>`;
 
-  /* ---- Row 1: ring + quick stats ---- */
+  /* ---- Today ---- */
+  if(plan){
+    if(plan.todayDay && !plan.todayDone){
+      html += `<button class="dash-start-btn dash-today-btn" onclick="selectDay('${plan.todayDay.id}')">Today: ${escapeHtml(plan.todayDay.name)} →</button>`;
+    }else{
+      const head = plan.todayDay ? `✓ ${escapeHtml(plan.todayDay.name)} done today` : 'No lifting planned today';
+      const nextTxt = plan.next ? `Next: ${escapeHtml(plan.next.day.name)} ${plan.next.inDays === 1 ? 'tomorrow' : 'on ' + WEEKDAY_NAMES[dayWeekday(plan.next.day)]}` : '';
+      html += `<div class="dash-today"><span class="dash-today-head">${head}</span>${nextTxt ? `<span class="dash-today-next">${nextTxt}</span>` : ''}</div>`;
+    }
+  }
+
+  /* ---- This week ---- */
   html += `<div class="dash-grid">
     <div class="dash-card full">
-      <div class="dash-card-label">This week</div>
+      <div class="dash-card-label">This week · ${fmt(wkStart)} – ${fmt(wkEndShown)}</div>
       <div class="dash-ring-wrap">
         ${ringSvg}
         <div class="dash-ring-info">
           <div class="dash-ring-stat">
             <span class="dash-ring-stat-val">${thisWeekCount}</span>
-            <span class="dash-ring-stat-label">Sessions this week</span>
+            <span class="dash-ring-stat-label">Session${thisWeekCount === 1 ? '' : 's'} logged</span>
           </div>
           <div class="dash-ring-stat">
-            <span class="dash-ring-stat-val" style="color:var(--brass)">${streak}</span>
-            <span class="dash-ring-stat-label">Week streak 🔥</span>
+            <span class="dash-ring-stat-val">${stats.daysSince === null ? '—' : stats.daysSince === 0 ? 'Today' : stats.daysSince + 'd'}</span>
+            <span class="dash-ring-stat-label">${stats.daysSince === null || stats.daysSince === 0 ? 'Last workout' : 'Since last workout'}</span>
           </div>
         </div>
       </div>
     </div>
     <div class="dash-card">
-      <div class="dash-card-label">Sessions</div>
-      <div class="dash-card-value">${thisWeekCount}</div>
-      <div class="dash-card-sub">This week</div>
-      <div class="dash-card-delta ${sessionDelta>0?'up':sessionDelta<0?'down':'flat'}">
-        ${sessionDelta>0?'↑ +'+sessionDelta:sessionDelta<0?'↓ '+sessionDelta:'→ same'} vs last week
-      </div>
-    </div>
-    <div class="dash-card">
       <div class="dash-card-label">Volume</div>
-      <div class="dash-card-value" style="font-size:1.3rem">${thisVol > 0 ? (thisVol >= 1000 ? (thisVol/1000).toFixed(1)+'k' : thisVol) : '—'}</div>
+      <div class="dash-card-value" style="font-size:1.3rem">${thisVol > 0 ? formatVolume(thisVol) : '—'}</div>
       <div class="dash-card-sub">${weightUnit} lifted this week</div>
-      ${thisVol > 0 && lastVol > 0 ? `<div class="dash-card-delta ${volDelta>0?'up':volDelta<0?'down':'flat'}">${volDelta>0?'↑ +':'↓ '}${Math.abs(volDelta)}% vs last week</div>` : ''}
+      ${thisVol > 0 && lastVol > 0 ? `<div class="dash-card-delta ${volDelta>0?'up':volDelta<0?'down':'flat'}">${volDelta>0?'↑ +':volDelta<0?'↓ ':'→ '}${Math.abs(volDelta)}% vs this point last week</div>` : ''}
     </div>
     <div class="dash-card">
       <div class="dash-card-label">All time</div>
       <div class="dash-card-value">${totalSessions}</div>
-      <div class="dash-card-sub">Total sessions</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-card-label">PRs</div>
-      <div class="dash-card-value">${prs.length}</div>
-      <div class="dash-card-sub">Exercises tracked</div>
+      <div class="dash-card-sub">Sessions · ${prs.length} exercise${prs.length === 1 ? '' : 's'} with a PR</div>
     </div>
   </div>`;
 
-  /* ---- 8-week consistency bars ---- */
-  html += `<p class="dash-section-title"><span>8-week consistency</span></p>
-  <div class="dash-card full" style="padding:0.85rem 1rem;">
-    <div class="dash-week-bars">`;
-  const weekLabels = Array.from({length:8}, (_,i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - (7-i)*7);
-    return d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
-  });
-  weekCounts.forEach((count, i) => {
-    const heightPct = Math.round((count / maxWeekCount) * 100);
-    const isCurrent = i === 7;
-    const isFull = count >= totalDays && totalDays > 0;
-    const barClass = isCurrent ? 'current' : isFull ? 'full' : '';
-    html += `<div class="dash-week-bar-wrap">
-      <div class="dash-week-bar ${barClass}" style="height:${Math.max(heightPct, count > 0 ? 8 : 2)}%;" title="${count} sessions"></div>
-      <div class="dash-week-label">${isCurrent ? 'Now' : weekLabels[i].split(' ')[1]}</div>
+  /* ---- Consistency ---- */
+  html += `<p class="dash-section-title"><span>Consistency</span></p>`;
+  if(!history.length){
+    html += `<div class="dash-card full"><p class="dash-no-data" style="padding:0.5rem 0">Your consistency stats appear here after your first logged workout.</p></div>`;
+  }else{
+    const pctCard = (a, label) => {
+      if(!a) return `<div class="dash-card"><div class="dash-card-label">${label}</div><div class="dash-card-value">—</div><div class="dash-card-sub">Needs one full week</div></div>`;
+      const cls = a.pct >= 80 ? 'up' : a.pct >= 50 ? 'flat' : 'down';
+      return `<div class="dash-card"><div class="dash-card-label">${label}</div>
+        <div class="dash-card-value">${a.pct}%</div>
+        <div class="dash-card-sub">${a.done} of ${a.possible} planned days${a.weeks < (label.includes('12') ? 12 : 4) ? ` · ${a.weeks} wk${a.weeks === 1 ? '' : 's'} so far` : ''}</div>
+        <div class="dash-meter"><span class="${cls}" style="width:${a.pct}%"></span></div></div>`;
+    };
+    html += `<div class="dash-grid">
+      ${pctCard(stats.a4, 'Last 4 weeks')}
+      ${pctCard(stats.a12, 'Last 12 weeks')}
+      <div class="dash-card"><div class="dash-card-label">Full-week streak</div>
+        <div class="dash-card-value" style="color:var(--brass)">${stats.currentFull}</div>
+        <div class="dash-card-sub">Weeks in a row with all ${totalDays} days done · best ${stats.bestFull}</div></div>
+      <div class="dash-card"><div class="dash-card-label">Active streak</div>
+        <div class="dash-card-value">${stats.activeStreak}</div>
+        <div class="dash-card-sub">Week${stats.activeStreak === 1 ? '' : 's'} in a row with at least one workout</div></div>
     </div>`;
-  });
-  html += `</div></div>`;
+
+    html += `<div class="dash-card full" style="margin-bottom:0.85rem">
+      <div class="dash-card-label">Last 13 weeks</div>
+      ${renderConsistencyCalendar()}
+    </div>`;
+
+    html += `<div class="dash-card full" style="margin-bottom:0.85rem">
+      <div class="dash-card-label">Planned days done per week</div>
+      ${renderWeeklyBars(totalDays)}
+    </div>`;
+
+    if(stats.perDay.length && stats.perDay[0].weeks > 0){
+      html += `<div class="dash-card full">
+        <div class="dash-card-label">Which days you skip · last ${stats.perDay[0].weeks} week${stats.perDay[0].weeks === 1 ? '' : 's'}</div>`;
+      stats.perDay.forEach(({day, done, weeks}) => {
+        const p = Math.round(done / weeks * 100);
+        html += `<div class="dash-volume-row" style="margin:0.35rem 0 0">
+          <div class="dash-volume-label" title="${escapeHtml(day.name)}">${escapeHtml(day.name)}</div>
+          <div class="dash-volume-bar-bg"><div class="dash-volume-bar ${p >= 80 ? 'good' : ''}" style="width:${Math.max(p, 2)}%"></div></div>
+          <div class="dash-volume-val">${done}/${weeks}</div>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+  }
 
   /* ---- Progress chart with exercise selector ---- */
   if(exWithHistory.length > 0){
@@ -2928,14 +3186,6 @@ function renderDashboard(){
   /* ---- Empty state ---- */
   if(history.length === 0){
     html += `<div class="dash-no-data">No sessions logged yet.<br>Tap a day below to start your first workout.</div>`;
-  }
-
-  /* ---- Start today CTA ---- */
-  const nextDay = program.find(d => !isDayCompletedThisWeek(d, completedSet)) || program[0];
-  if(nextDay){
-    html += `<button class="dash-start-btn" onclick="selectDay('${nextDay.id}')">
-      Start today — ${escapeHtml(nextDay.name)} →
-    </button>`;
   }
 
   document.getElementById('main').innerHTML = html;
@@ -3144,6 +3394,10 @@ function renderProfile(){
       <label class="pf-field"><span>Main goal</span>
         <select onchange="updateProfileField('goal', this.value)">
           ${opt('goal','','Select…')}${opt('goal','strength','Get stronger')}${opt('goal','hypertrophy','Build muscle')}${opt('goal','fatloss','Lose fat')}${opt('goal','general','General fitness')}${opt('goal','endurance','Endurance / conditioning')}
+        </select></label>
+      <label class="pf-field pf-wide"><span>Week starts on</span>
+        <select onchange="updateProfileField('weekStart', this.value)">
+          ${opt('weekStart','','Automatic (' + (getWeekStartDay() === 0 ? 'Sunday' : 'Monday') + ', from your plan)')}${opt('weekStart','sun','Sunday')}${opt('weekStart','mon','Monday')}
         </select></label>
       <label class="pf-field pf-wide"><span>Injuries or limitations</span>
         <input type="text" value="${escapeHtml(p.injuries || '')}" placeholder="e.g. sore left shoulder (optional)" onchange="updateProfileField('injuries', this.value)"></label>
