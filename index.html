@@ -523,6 +523,59 @@
   }
   .suggestion-add-weight{ background:rgba(212,162,78,0.12); color:var(--brass); }
   .suggestion-stall{ background:rgba(193,89,47,0.12); color:var(--accent); }
+  /* --- Rest timer --- */
+  .rest-timer{
+    position:fixed; left:50%; bottom:84px; transform:translateX(-50%); z-index:900;
+    width:calc(100% - 32px); max-width:420px; background:var(--surface-2);
+    border:1px solid var(--brass); border-radius:12px; padding:0.65rem 0.85rem;
+    box-shadow:0 8px 24px rgba(0,0,0,0.45); animation:slideUp 0.2s ease;
+  }
+  .rest-timer.hidden{ display:none; }
+  .rest-timer.done{ border-color:var(--accent); animation:restPulse 0.9s ease-in-out 3; }
+  @keyframes restPulse{ 50%{ box-shadow:0 0 0 6px rgba(193,89,47,0.35); } }
+  .rest-top{ display:flex; align-items:center; gap:0.6rem; }
+  .rest-label{ font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.06em; font-size:0.75rem; color:var(--text-dim); }
+  .rest-time{ font-family:'JetBrains Mono', monospace; font-size:1.6rem; color:var(--brass); flex:1; line-height:1.1; }
+  .rest-timer.done .rest-time{ color:var(--accent); font-size:1.15rem; font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.06em; }
+  .rest-btn{
+    background:none; border:1px solid var(--border); color:var(--text); border-radius:6px;
+    padding:0.35rem 0.55rem; font-size:0.78rem; cursor:pointer; font-family:'JetBrains Mono', monospace;
+  }
+  .rest-btn:hover{ border-color:var(--brass); }
+  .rest-bar{ height:4px; background:var(--border); border-radius:2px; margin:0.5rem 0 0.45rem; overflow:hidden; }
+  .rest-bar-fill{ height:100%; background:var(--brass); width:100%; transition:width 0.25s linear; }
+  .rest-bottom{ display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap; }
+  .rest-chip{
+    background:none; border:1px solid var(--border); color:var(--text-dim); border-radius:999px;
+    padding:0.15rem 0.55rem; font-size:0.72rem; cursor:pointer;
+  }
+  .rest-chip.active{ border-color:var(--brass); color:var(--brass); }
+  .rest-auto{ margin-left:auto; display:flex; align-items:center; gap:0.3rem; font-size:0.72rem; color:var(--text-dim); cursor:pointer; }
+  body.rest-open{ padding-bottom:190px; }
+  .rest-start-btn{
+    background:none; border:1px solid var(--border); color:var(--text-dim); border-radius:5px;
+    padding:0.3rem 0.6rem; font-size:0.75rem; cursor:pointer; margin-left:0.5rem;
+  }
+  .rest-start-btn:hover{ color:var(--brass); border-color:var(--brass); }
+
+  /* --- Backup (export / import) --- */
+  .backup-card{ background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.85rem 1rem; margin-bottom:1rem; }
+  .backup-title{ font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.05em; font-size:0.95rem; margin:0 0 0.2rem; color:var(--brass); }
+  .backup-sub{ color:var(--text-dim); font-size:0.78rem; margin:0 0 0.7rem; }
+  .backup-actions{ display:flex; gap:0.5rem; flex-wrap:wrap; }
+  .backup-btn{
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text); border-radius:6px;
+    padding:0.45rem 0.8rem; font-size:0.8rem; cursor:pointer;
+  }
+  .backup-btn:hover{ border-color:var(--brass); }
+  .backup-msg{ font-size:0.78rem; color:var(--brass); margin:0.6rem 0 0; min-height:1em; }
+  .import-summary{ color:var(--text-dim); font-size:0.85rem; margin:0 0 1rem; }
+  .import-choice{ display:flex; flex-direction:column; gap:0.6rem; }
+  .import-choice button{ text-align:left; padding:0.75rem 0.9rem; border-radius:8px; cursor:pointer; font-size:0.85rem; border:1px solid var(--border); background:var(--surface-2); color:var(--text); }
+  .import-choice button strong{ display:block; font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.05em; font-weight:500; }
+  .import-choice button span{ color:var(--text-dim); font-size:0.78rem; }
+  .import-choice button.danger:hover{ border-color:var(--accent); }
+  .import-choice button:hover{ border-color:var(--brass); }
 </style>
 </head>
 <body>
@@ -548,6 +601,8 @@
 <main id="main"></main>
 
 <footer id="footer"></footer>
+<div id="rest-timer" class="rest-timer hidden" aria-live="polite"></div>
+<input type="file" id="import-file" accept=".json,application/json" style="display:none" onchange="handleImportFile(this)">
 <div id="modal-root"></div>
 
 <script>
@@ -1425,7 +1480,9 @@ function updateField(exId, idx, field, value){
   if(field === 'weight'){
     rows[exId][idx][field] = fromDisplayWeight(value);
   }else{
+    const hadReps = rows[exId][idx].reps !== '' && rows[exId][idx].reps != null;
     rows[exId][idx][field] = value;
+    if(field === 'reps' && value !== '' && !hadReps && restAuto) startRestTimer();
   }
 }
 
@@ -1528,7 +1585,10 @@ function renderLog(){
     });
 
     html += `<div class="row-actions">
-        <button class="add-set" onclick="addSet('${ex.id}')">+ Add set</button>
+        <div>
+          <button class="add-set" onclick="addSet('${ex.id}')">+ Add set</button>
+          <button class="rest-start-btn" onclick="startRestTimer()" aria-label="Start rest timer">&#9201; Rest</button>
+        </div>
         <div class="tally">${renderTally((rows[ex.id]||[]).filter(r=>r.weight!=='' || r.reps!=='').length)}</div>
       </div>
     </div>`;
@@ -1556,7 +1616,17 @@ let editingSessionId = null;
 let editingSessionDraft = null;
 
 function renderHistory(){
-  let html = `<h2 class="day-head">History</h2>`;
+  let html = `<h2 class="day-head">History</h2>
+    <div class="backup-card">
+      <p class="backup-title">Backup</p>
+      <p class="backup-sub">Save a copy of your program and history to a file, or restore one. Works without Google Drive.</p>
+      <div class="backup-actions">
+        <button class="backup-btn" onclick="exportBackupJson()">&#8595; Export backup (.json)</button>
+        <button class="backup-btn" onclick="exportHistoryCsv()" ${history.length ? '' : 'disabled'}>&#8595; Export history (.csv)</button>
+        <button class="backup-btn" onclick="triggerImport()">&#8593; Import backup</button>
+      </div>
+      <p class="backup-msg" id="backup-msg"></p>
+    </div>`;
   if(history.length === 0){
     html += `<p class="empty">No sessions logged yet. Log your first workout from the day tabs above.</p>`;
   }else{
@@ -2831,11 +2901,301 @@ function render(){
   else renderLog();
 }
 
+/* ===================== Rest timer ===================== */
+const REST_PRESETS = [60, 90, 120, 180];
+let restDefault = 90;
+let restAuto = true;
+let restEndAt = 0;
+let restTotal = 0;
+let restInterval = null;
+let restAudioCtx = null;
+
+function loadRestSettings(){
+  try{
+    const s = parseInt(localStorage.getItem('rest-seconds'), 10);
+    if(s > 0) restDefault = s;
+    restAuto = localStorage.getItem('rest-auto') !== '0';
+  }catch(e){}
+}
+
+function formatRest(sec){
+  sec = Math.max(0, Math.ceil(sec));
+  return Math.floor(sec/60) + ':' + String(sec % 60).padStart(2,'0');
+}
+
+function primeRestAudio(){
+  try{
+    if(!restAudioCtx){
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if(Ctx) restAudioCtx = new Ctx();
+    }
+    if(restAudioCtx && restAudioCtx.state === 'suspended') restAudioCtx.resume();
+  }catch(e){}
+}
+
+function playRestBeep(){
+  if(!restAudioCtx) return;
+  try{
+    const now = restAudioCtx.currentTime;
+    [0, 0.25, 0.5].forEach(offset => {
+      const osc = restAudioCtx.createOscillator();
+      const gain = restAudioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.0001, now + offset);
+      gain.gain.exponentialRampToValueAtTime(0.3, now + offset + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.18);
+      osc.connect(gain).connect(restAudioCtx.destination);
+      osc.start(now + offset);
+      osc.stop(now + offset + 0.2);
+    });
+  }catch(e){}
+}
+
+function startRestTimer(seconds){
+  primeRestAudio();
+  restTotal = seconds || restDefault;
+  restEndAt = Date.now() + restTotal * 1000;
+  clearInterval(restInterval);
+  restInterval = setInterval(tickRestTimer, 250);
+  renderRestTimer();
+}
+
+function adjustRestTimer(delta){
+  if(!restEndAt) return;
+  const remaining = Math.max(0, restEndAt - Date.now()) / 1000;
+  if(remaining <= 0 && delta < 0) return;
+  const next = Math.max(1, remaining + delta);
+  restEndAt = Date.now() + next * 1000;
+  restTotal = Math.max(restTotal, next);
+  if(!restInterval) restInterval = setInterval(tickRestTimer, 250);
+  renderRestTimer();
+}
+
+function stopRestTimer(){
+  clearInterval(restInterval);
+  restInterval = null;
+  restEndAt = 0;
+  renderRestTimer();
+}
+
+function setRestDefault(sec){
+  restDefault = sec;
+  try{ localStorage.setItem('rest-seconds', String(sec)); }catch(e){}
+  startRestTimer(sec);
+}
+
+function toggleRestAuto(checked){
+  restAuto = checked;
+  try{ localStorage.setItem('rest-auto', checked ? '1' : '0'); }catch(e){}
+}
+
+function tickRestTimer(){
+  const remaining = (restEndAt - Date.now()) / 1000;
+  if(remaining <= 0){
+    clearInterval(restInterval);
+    restInterval = null;
+    playRestBeep();
+    try{ if(navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]); }catch(e){}
+    renderRestTimer();
+    return;
+  }
+  const timeEl = document.getElementById('rest-time');
+  const fillEl = document.getElementById('rest-bar-fill');
+  if(timeEl) timeEl.textContent = formatRest(remaining);
+  if(fillEl) fillEl.style.width = (restTotal ? (remaining / restTotal) * 100 : 0) + '%';
+}
+
+function renderRestTimer(){
+  const el = document.getElementById('rest-timer');
+  if(!el) return;
+  if(!restEndAt){
+    el.className = 'rest-timer hidden';
+    el.innerHTML = '';
+    document.body.classList.remove('rest-open');
+    return;
+  }
+  document.body.classList.add('rest-open');
+  const remaining = (restEndAt - Date.now()) / 1000;
+  const done = remaining <= 0;
+  el.className = 'rest-timer' + (done ? ' done' : '');
+  el.innerHTML = `
+    <div class="rest-top">
+      <div style="flex:1">
+        <div class="rest-label">${done ? 'Rest complete' : 'Resting'}</div>
+        <div class="rest-time" id="rest-time">${done ? 'Next set!' : formatRest(remaining)}</div>
+      </div>
+      ${done ? '' : `<button class="rest-btn" onclick="adjustRestTimer(-15)" aria-label="Subtract 15 seconds">-15</button>
+      <button class="rest-btn" onclick="adjustRestTimer(15)" aria-label="Add 15 seconds">+15</button>`}
+      <button class="rest-btn" onclick="stopRestTimer()">${done ? 'Dismiss' : 'Skip'}</button>
+    </div>
+    <div class="rest-bar"><div class="rest-bar-fill" id="rest-bar-fill" style="width:${done ? 0 : (remaining / restTotal) * 100}%"></div></div>
+    <div class="rest-bottom">
+      ${REST_PRESETS.map(s => `<button class="rest-chip ${s === restDefault ? 'active' : ''}" onclick="setRestDefault(${s})">${formatRest(s)}</button>`).join('')}
+      <label class="rest-auto"><input type="checkbox" ${restAuto ? 'checked' : ''} onchange="toggleRestAuto(this.checked)"> Auto-start</label>
+    </div>`;
+}
+
+/* ===================== Backup: export / import ===================== */
+function downloadFile(filename, content, mime){
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function backupDateStamp(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function setBackupMsg(text){
+  const el = document.getElementById('backup-msg');
+  if(el) el.textContent = text;
+}
+
+function exportBackupJson(){
+  const data = {
+    app: 'iron-log',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    weightUnit,
+    header: appHeader,
+    program,
+    history
+  };
+  downloadFile(`iron-log-backup-${backupDateStamp()}.json`, JSON.stringify(data, null, 2), 'application/json');
+  setBackupMsg(`Exported ${history.length} session${history.length === 1 ? '' : 's'} and your program.`);
+}
+
+function csvCell(v){
+  const s = String(v == null ? '' : v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+
+function exportHistoryCsv(){
+  const lines = [['date','day','exercise','set','weight','unit','reps'].join(',')];
+  history.forEach(sess => {
+    const day = program.find(d => d.id === sess.dayId);
+    const dayName = sess.dayName || (day ? day.name : '');
+    Object.keys(sess.exercises || {}).forEach(key => {
+      let meta = findExerciseMetaByCanonical(key);
+      if(!meta && day) meta = day.exercises.find(e => e.id === key);
+      const exName = meta ? meta.name : key;
+      (sess.exercises[key] || []).forEach((s, i) => {
+        lines.push([
+          new Date(sess.date).toISOString().slice(0,10),
+          dayName, exName, i + 1,
+          s.weight ? toDisplayWeight(s.weight) : '',
+          weightUnit, s.reps
+        ].map(csvCell).join(','));
+      });
+    });
+  });
+  downloadFile(`iron-log-history-${backupDateStamp()}.csv`, lines.join('\n'), 'text/csv');
+  setBackupMsg('Exported history as CSV (opens in Excel / Google Sheets).');
+}
+
+let pendingImport = null;
+
+function triggerImport(){
+  const input = document.getElementById('import-file');
+  if(input){ input.value = ''; input.click(); }
+}
+
+function handleImportFile(input){
+  const file = input.files && input.files[0];
+  input.value = '';
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let data;
+    try{ data = JSON.parse(reader.result); }
+    catch(e){ setBackupMsg('That file is not valid JSON.'); return; }
+    const hist = Array.isArray(data) ? data : data && data.history;
+    const prog = data && Array.isArray(data.program) ? data.program : null;
+    const validHist = Array.isArray(hist) && hist.every(s => s && s.date && s.exercises && typeof s.exercises === 'object');
+    const validProg = !prog || prog.every(d => d && d.id && Array.isArray(d.exercises));
+    if(!validHist || !validProg){
+      setBackupMsg('This doesn’t look like an Iron Log backup file.');
+      return;
+    }
+    pendingImport = {
+      history: hist,
+      program: prog,
+      header: data.header && data.header.title ? data.header : null,
+      weightUnit: data.weightUnit === 'kg' || data.weightUnit === 'lb' ? data.weightUnit : null
+    };
+    showImportChoice(file.name);
+  };
+  reader.onerror = () => setBackupMsg('Could not read that file.');
+  reader.readAsText(file);
+}
+
+function showImportChoice(fileName){
+  const p = pendingImport;
+  const root = document.getElementById('modal-root');
+  document.body.style.overflow = 'hidden';
+  root.innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-header">
+          <h3 class="modal-title">Import backup</h3>
+          <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+        </div>
+        <p class="import-summary">${escapeHtml(fileName)} contains ${p.history.length} session${p.history.length === 1 ? '' : 's'}${p.program ? ` and a ${p.program.length}-day program` : ''}.</p>
+        <div class="import-choice">
+          <button onclick="applyImport('merge')"><strong>Merge</strong><span>Add these sessions to your current history. Your program stays as is.</span></button>
+          <button class="danger" onclick="applyImport('replace')"><strong>Replace everything</strong><span>Overwrite your current history${p.program ? ', program' : ''} and settings with this backup.</span></button>
+          <button onclick="closeModal()"><strong>Cancel</strong></button>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function applyImport(mode){
+  const p = pendingImport;
+  if(!p) return;
+  if(mode === 'replace'){
+    if(!confirm('Replace all of your current data with this backup? This cannot be undone.')) return;
+    history = mergeHistories([], p.history);
+    if(p.program && p.program.length){
+      program = p.program;
+      await saveProgram();
+    }
+    if(p.header){
+      appHeader = p.header;
+      await saveHeader();
+      renderHeader();
+    }
+    if(p.weightUnit) setWeightUnit(p.weightUnit);
+  }else{
+    history = mergeHistories(history, p.history);
+  }
+  await saveHistory();
+  pendingImport = null;
+  closeModal();
+  if(!program.find(d => d.id === currentDayId) && program.length) currentDayId = program[0].id;
+  resetRows();
+  editingSessionId = null;
+  editingSessionDraft = null;
+  currentView = 'history';
+  render();
+  setBackupMsg(mode === 'replace' ? 'Backup restored.' : `Merged — you now have ${history.length} sessions.`);
+  autoPushToDrive();
+}
+
 (async function init(){
   await loadProgram();
   await loadHistory();
   await loadHeader();
   loadWeightUnit();
+  loadRestSettings();
   document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
   renderHeader();
   renderUnitToggle();
