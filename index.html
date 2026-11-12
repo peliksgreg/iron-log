@@ -564,6 +564,33 @@
   }
   .load-default-btn:hover{ color:var(--brass); border-color:var(--brass); }
 
+  /* --- Profile --- */
+  .profile-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:8px;
+    padding:0.9rem 1rem; margin-bottom:1rem; display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;
+  }
+  .profile-card > .backup-title, .profile-card > .backup-sub, .profile-card > .pf-sugg-day,
+  .profile-card > .pf-sugg-row, .profile-card > .pf-msg, .pf-wide{ grid-column:1 / -1; }
+  .profile-card > .backup-sub{ margin:0; }
+  .pf-field{ display:flex; flex-direction:column; gap:0.3rem; min-width:0; }
+  .pf-field > span{ font-size:0.72rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; }
+  .pf-field input, .pf-field select{
+    width:100%; min-width:0; background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:0.5rem 0.6rem; font-size:0.9rem; font-family:inherit;
+  }
+  .pf-unit-wrap{ display:flex; align-items:center; gap:0.35rem; }
+  .pf-unit-wrap em{ font-style:normal; color:var(--text-dim); font-size:0.75rem; }
+  .pf-msg{ margin:0; min-height:1em; }
+  .pf-source{ justify-self:start; margin-left:0; }
+  .pf-hint{ color:var(--text-dim); font-size:0.7rem; line-height:1.3; }
+  .pf-source .unit-opt{ font-family:inherit; font-size:0.78rem; padding:0.35rem 0.7rem; }
+  .pf-bmi{ color:var(--text-dim); font-size:0.78rem; margin:-0.4rem 0 1rem; }
+  .pf-sugg-day{ font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.05em; font-size:0.85rem; color:var(--accent); margin:0.4rem 0 -0.4rem; }
+  .pf-sugg-row{ display:flex; justify-content:space-between; gap:0.75rem; font-size:0.85rem; border-bottom:1px solid var(--border); padding-bottom:0.35rem; }
+  .pf-sugg-row small{ color:var(--text-dim); }
+  .pf-sugg-val{ font-family:'JetBrains Mono', monospace; color:var(--brass); text-align:right; white-space:nowrap; }
+  @media (max-width:380px){ .profile-card{ grid-template-columns:1fr; } }
+
   /* --- Backup (export / import) --- */
   .backup-card{ background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.85rem 1rem; margin-bottom:1rem; }
   .backup-title{ font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:0.05em; font-size:0.95rem; margin:0 0 0.2rem; color:var(--brass); }
@@ -650,12 +677,6 @@ const DEFAULT_PROGRAM = [
     { id:'fl-bss', name:'Bulgarian split squat',     target:'2 x 8 / leg', bw:true, rest:90,  restLabel:'90 s' }
   ]}
 ];
-
-function formatStartWeight(ex){
-  if(!ex || !(ex.start > 0)) return '';
-  const conv = kg => weightUnit === 'kg' ? kg : Math.round(kgToLb(kg) * 2) / 2;
-  return conv(ex.start) + (ex.startMax ? '–' + conv(ex.startMax) : '') + weightUnit;
-}
 
 function findExerciseById(exId){
   for(const d of program){
@@ -1224,6 +1245,14 @@ async function syncWithDrive(){
       await writeDriveFile(DRIVE_HEADER_FILE, appHeader);
     }
 
+    const remoteProfile = await readDriveFile(DRIVE_PROFILE_FILE);
+    if(remoteProfile && remoteProfile.updatedAt && (!profile.updatedAt || remoteProfile.updatedAt > profile.updatedAt)){
+      profile = remoteProfile;
+      try{ localStorage.setItem(STORAGE_PROFILE_KEY, JSON.stringify(profile)); }catch(e){}
+    }else if(profile.updatedAt){
+      await writeDriveFile(DRIVE_PROFILE_FILE, profile);
+    }
+
     localStorage.removeItem('program-edited-since-sync');
 
     setSyncStatus('Synced just now');
@@ -1244,6 +1273,7 @@ async function autoPushToDrive(){
     await writeDriveFile(DRIVE_HISTORY_FILE, history);
     await writeDriveFile(DRIVE_PROGRAM_FILE, program);
     await writeDriveFile(DRIVE_HEADER_FILE, appHeader);
+    if(profile.updatedAt) await writeDriveFile(DRIVE_PROFILE_FILE, profile);
     setSyncStatus('Synced just now');
   }catch(e){
     console.error(e);
@@ -1457,6 +1487,7 @@ function renderNav(){
     html += `<button class="tab ${currentView==='log' && currentDayId===d.id ? 'active':''}" onclick="selectDay('${d.id}')">${done ? '&#10003; ':''}${escapeHtml(d.name)}</button>`;
   });
   html += `<button class="tab ${currentView==='history' ? 'active':''}" onclick="selectHistory()">History</button>`;
+  html += `<button class="tab ${currentView==='profile' ? 'active':''}" onclick="selectProfile()">Profile</button>`;
   html += `<button class="tab personalize-tab ${(currentView==='wizard'||currentView==='wizard-resolve') ? 'active':''}" onclick="startWizard()">Personalize</button>`;
   html += `<button class="tab edit-tab ${currentView==='edit' ? 'active':''}" onclick="selectEdit()">Edit program</button>`;
   nav.innerHTML = html;
@@ -1559,8 +1590,13 @@ function renderLog(){
 
   day.exercises.forEach(ex => {
     const last = lastSessionFor(currentDayId, ex);
-    const startText = formatStartWeight(ex);
-    let lastText = startText ? `No previous session \u2014 suggested start: ${startText}${ex.bw ? ' added' : ''}` : 'No previous session logged';
+    const startSugg = last ? null : getStartSuggestion(ex);
+    let lastText = 'No previous session logged';
+    if(startSugg){
+      lastText = `No previous session \u2014 suggested start: ${startSugg.text}${ex.bw ? ' added' : ''}${startSugg.source === 'profile' ? ' (from your profile)' : ''}`;
+    }else if(ex.bw && !last){
+      lastText = 'No previous session \u2014 start with bodyweight';
+    }
     if(last && last.length){
       lastText = 'Last time: ' + last.map(s => ex.bw ? `${s.reps} reps${s.weight ? ' +'+toDisplayWeight(s.weight)+weightUnit:''}` : `${toDisplayWeight(s.weight)}${weightUnit} x ${s.reps}`).join(', ');
     }
@@ -1583,7 +1619,7 @@ function renderLog(){
     (rows[ex.id] || [{weight:'',reps:''}]).forEach((row,idx) => {
       html += `<div class="set-row">
         <span class="set-num">${idx+1}</span>
-        <input type="number" inputmode="decimal" placeholder="${!last && ex.start ? (weightUnit === 'kg' ? ex.start : Math.round(kgToLb(ex.start) * 2) / 2) : (ex.bw ? 'added wt' : 'weight')}" value="${toDisplayWeight(row.weight)}" step="2.5"
+        <input type="number" inputmode="decimal" placeholder="${startSugg ? kgForDisplay(startSugg.kg) : (ex.bw ? 'added wt' : 'weight')}" value="${toDisplayWeight(row.weight)}" step="2.5"
           onchange="updateField('${ex.id}', ${idx}, 'weight', this.value)">
         <span class="unit">${weightUnit}</span>
         <input type="number" inputmode="numeric" placeholder="reps" value="${row.reps}"
@@ -1628,7 +1664,7 @@ function renderHistory(){
   let html = `<h2 class="day-head">History</h2>
     <div class="backup-card">
       <p class="backup-title">Backup</p>
-      <p class="backup-sub">Save a copy of your program and history to a file, or restore one. Works without Google Drive.</p>
+      <p class="backup-sub">Save a copy of your program, history and profile to a file, or restore one. Works without Google Drive.</p>
       <div class="backup-actions">
         <button class="backup-btn" onclick="exportBackupJson()">&#8595; Export backup (.json)</button>
         <button class="backup-btn" onclick="exportHistoryCsv()" ${history.length ? '' : 'disabled'}>&#8595; Export history (.csv)</button>
@@ -2174,6 +2210,8 @@ const MIN_GENERATION_MS = 10000;
 function startWizard(){
   wizardStep = 0;
   wizardAnswers = {};
+  if(profile.experience) wizardAnswers.experience = profile.experience;
+  if(profile.goal) wizardAnswers.goal = profile.goal;
   currentView = 'wizard';
   render();
 }
@@ -2914,9 +2952,264 @@ function render(){
   if(currentView === 'dashboard') renderDashboard();
   else if(currentView === 'history') renderHistory();
   else if(currentView === 'edit') renderEdit();
+  else if(currentView === 'profile') renderProfile();
   else if(currentView === 'wizard') renderWizard();
   else if(currentView === 'wizard-resolve') renderWizardResolve();
   else renderLog();
+}
+
+/* ===================== Profile & suggested weights ===================== */
+const STORAGE_PROFILE_KEY = 'iron-profile';
+const DRIVE_PROFILE_FILE = 'iron-log-profile.json';
+let profile = {};
+
+async function loadProfile(){
+  let loaded = null;
+  if(hasCloudStorage){
+    try{
+      const res = await window.storage.get(STORAGE_PROFILE_KEY, false);
+      loaded = res && res.value ? JSON.parse(res.value) : null;
+    }catch(e){ loaded = null; }
+  }else{
+    try{
+      const raw = localStorage.getItem(STORAGE_PROFILE_KEY);
+      loaded = raw ? JSON.parse(raw) : null;
+    }catch(e){ loaded = null; }
+  }
+  profile = (loaded && typeof loaded === 'object') ? loaded : {};
+}
+
+async function saveProfile(){
+  profile.updatedAt = new Date().toISOString();
+  if(hasCloudStorage){
+    try{ await window.storage.set(STORAGE_PROFILE_KEY, JSON.stringify(profile), false); return; }
+    catch(e){ console.error('Could not save profile to cloud storage', e); return; }
+  }
+  try{ localStorage.setItem(STORAGE_PROFILE_KEY, JSON.stringify(profile)); }
+  catch(e){ console.error('Could not save profile to local storage', e); }
+}
+
+function profileIsComplete(){
+  return profile.weightKg > 0 && !!profile.sex && !!profile.experience;
+}
+
+// Starting working-set loads for 8-12 reps, as a fraction of body weight, for a new male lifter aged 18-39.
+// "db" = per dumbbell. Matched against the exercise name, first match wins.
+const STRENGTH_RATIOS = [
+  { re:/front squat/,                                ratio:0.45, region:'lower' },
+  { re:/goblet/,                                     ratio:0.20, region:'lower', db:true },
+  { re:/split squat|lunge|step[- ]?up/,              ratio:0.10, region:'lower', db:true },
+  { re:/hack squat/,                                 ratio:0.70, region:'lower' },
+  { re:/leg press/,                                  ratio:1.20, region:'lower' },
+  { re:/squat/,                                      ratio:0.60, region:'lower' },
+  { re:/romanian|rdl|stiff/,                         ratio:0.50, region:'lower' },
+  { re:/deadlift/,                                   ratio:0.75, region:'lower' },
+  { re:/hip thrust|glute bridge/,                    ratio:0.60, region:'lower' },
+  { re:/leg curl/,                                   ratio:0.35, region:'lower' },
+  { re:/leg extension/,                              ratio:0.40, region:'lower' },
+  { re:/calf/,                                       ratio:0.30, region:'lower' },
+  { re:/kettlebell swing|kb swing/,                  ratio:0.20, region:'lower' },
+  { re:/incline.*(db|dumbbell)|(db|dumbbell).*incline/, ratio:0.17, region:'upper', db:true },
+  { re:/(db|dumbbell).*(bench|press)|(flat|bench).*(db|dumbbell)/, ratio:0.20, region:'upper', db:true, notIf:/shoulder|overhead/ },
+  { re:/(db|dumbbell).*(shoulder|overhead) press|(shoulder|overhead).*(db|dumbbell)|arnold/, ratio:0.12, region:'upper', db:true },
+  { re:/incline.*bench/,                             ratio:0.42, region:'upper' },
+  { re:/bench press/,                                ratio:0.50, region:'upper' },
+  { re:/overhead press|shoulder press|military/,     ratio:0.33, region:'upper' },
+  { re:/lateral raise/,                              ratio:0.05, region:'upper', db:true, notIf:/cable/ },
+  { re:/cable lateral/,                              ratio:0.04, region:'upper' },
+  { re:/rear[- ]?delt|reverse fly/,                  ratio:0.04, region:'upper', db:true },
+  { re:/pec deck|chest fly machine/,                 ratio:0.35, region:'upper' },
+  { re:/fly/,                                        ratio:0.08, region:'upper', db:true },
+  { re:/pushdown/,                                   ratio:0.20, region:'upper' },
+  { re:/skull/,                                      ratio:0.20, region:'upper' },
+  { re:/overhead.*(triceps|extension)/,              ratio:0.12, region:'upper' },
+  { re:/straight[- ]arm/,                            ratio:0.20, region:'upper' },
+  { re:/pulldown/,                                   ratio:0.50, region:'upper' },
+  { re:/chest[- ]supported|single[- ]arm.*row|one[- ]arm.*row|(db|dumbbell).*row/, ratio:0.18, region:'upper', db:true },
+  { re:/row/,                                        ratio:0.45, region:'upper' },
+  { re:/face pull/,                                  ratio:0.15, region:'upper' },
+  { re:/shrug/,                                      ratio:0.25, region:'upper', db:true },
+  { re:/incline.*curl/,                              ratio:0.08, region:'upper', db:true },
+  { re:/hammer/,                                     ratio:0.11, region:'upper', db:true },
+  { re:/(ez|barbell).*curl/,                         ratio:0.25, region:'upper' },
+  { re:/cable curl/,                                 ratio:0.20, region:'upper' },
+  { re:/curl/,                                       ratio:0.10, region:'upper', db:true }
+];
+
+const EXPERIENCE_FACTOR = { beginner:1.0, intermediate:1.35, advanced:1.7 };
+
+function sexFactor(region){
+  if(profile.sex === 'male') return 1;
+  if(profile.sex === 'female') return region === 'upper' ? 0.6 : 0.75;
+  return region === 'upper' ? 0.8 : 0.87;
+}
+
+function ageFactor(){
+  const a = Number(profile.age);
+  if(!a) return 1;
+  if(a < 16) return 0.75;
+  if(a < 18) return 0.88;
+  if(a < 40) return 1;
+  if(a < 50) return 0.93;
+  if(a < 60) return 0.85;
+  if(a < 70) return 0.75;
+  return 0.65;
+}
+
+// Above a BMI of 25, extra body weight is mostly not muscle, so only part of it counts.
+function effectiveBodyWeightKg(){
+  const w = Number(profile.weightKg);
+  const h = Number(profile.heightCm) / 100;
+  if(!h) return w;
+  const ideal = 25 * h * h;
+  return w > ideal ? ideal + 0.4 * (w - ideal) : w;
+}
+
+function profileBmi(){
+  const w = Number(profile.weightKg), h = Number(profile.heightCm) / 100;
+  return (w && h) ? w / (h * h) : null;
+}
+
+function roundLoadKg(kg){
+  // Round in the unit the user sees: 2.5 kg plates/dumbbells, or 5 lb.
+  if(weightUnit === 'lb'){
+    const lb = Math.max(5, Math.round(kgToLb(kg) / 5) * 5);
+    return lbToKg(lb);
+  }
+  return Math.max(2, Math.round(kg / 2.5) * 2.5);
+}
+
+function profileSuggestedKg(ex){
+  if(!ex || ex.bw || !profileIsComplete()) return null;
+  const name = String(ex.name).toLowerCase();
+  const rule = STRENGTH_RATIOS.find(r => r.re.test(name) && !(r.notIf && r.notIf.test(name)));
+  if(!rule) return null;
+  const kg = effectiveBodyWeightKg() * rule.ratio
+    * (EXPERIENCE_FACTOR[profile.experience] || 1)
+    * sexFactor(rule.region) * ageFactor();
+  return roundLoadKg(kg);
+}
+
+function kgForDisplay(kg){
+  return weightUnit === 'kg' ? Math.round(kg * 10) / 10 : Math.round(kgToLb(kg) * 2) / 2;
+}
+
+// Returns { kg, text, source } for an exercise with no logged history, or null.
+function getStartSuggestion(ex){
+  if(!ex) return null;
+  const preferPlan = profile.suggestFrom === 'plan' && ex.start > 0;
+  const fromProfile = preferPlan ? null : profileSuggestedKg(ex);
+  const planText = ex.start > 0 ? kgForDisplay(ex.start) + (ex.startMax ? '–' + kgForDisplay(ex.startMax) : '') + weightUnit : '';
+  if(fromProfile){
+    return { kg: fromProfile, source:'profile', text: kgForDisplay(fromProfile) + weightUnit, planText };
+  }
+  if(planText) return { kg: ex.start, source:'plan', text: planText, planText };
+  return null;
+}
+
+function selectProfile(){ currentView = 'profile'; render(); }
+
+function renderProfile(){
+  const p = profile;
+  const isKg = weightUnit === 'kg';
+  const weightVal = p.weightKg ? kgForDisplay(p.weightKg) : '';
+  const totalIn = p.heightCm ? p.heightCm / 2.54 : 0;
+  const ft = totalIn ? Math.floor(totalIn / 12) : '';
+  const inch = totalIn ? Math.round(totalIn - ft * 12) : '';
+  const opt = (field, value, label) => `<option value="${value}" ${String(p[field] || '') === String(value) ? 'selected' : ''}>${label}</option>`;
+
+  let html = `<h2 class="day-head">Profile</h2>
+    <p class="day-sub">Used to suggest starting weights for exercises you haven't logged yet. Stored on this device${accessToken ? ' and synced to Google Drive' : ''}.</p>
+    <div class="profile-card">
+      <label class="pf-field pf-wide"><span>Name</span>
+        <input type="text" value="${escapeHtml(p.name || '')}" placeholder="Optional" onchange="updateProfileField('name', this.value)"></label>
+      <label class="pf-field"><span>Gender</span>
+        <select onchange="updateProfileField('sex', this.value)">
+          ${opt('sex','','Select…')}${opt('sex','male','Male')}${opt('sex','female','Female')}${opt('sex','other','Other / prefer not to say')}
+        </select></label>
+      <label class="pf-field"><span>Age</span>
+        <input type="number" inputmode="numeric" min="10" max="100" value="${p.age || ''}" placeholder="years" onchange="updateProfileField('age', this.value)"></label>
+      ${isKg
+        ? `<label class="pf-field"><span>Height</span>
+            <div class="pf-unit-wrap"><input type="number" inputmode="decimal" value="${p.heightCm ? Math.round(p.heightCm) : ''}" placeholder="cm" onchange="updateProfileField('heightCm', this.value)"><em>cm</em></div></label>`
+        : `<label class="pf-field"><span>Height</span>
+            <div class="pf-unit-wrap"><input type="number" inputmode="numeric" value="${ft}" placeholder="ft" onchange="updateHeightImperial(this.value, null)"><em>ft</em>
+            <input type="number" inputmode="numeric" value="${inch}" placeholder="in" onchange="updateHeightImperial(null, this.value)"><em>in</em></div></label>`}
+      <label class="pf-field"><span>Body weight</span>
+        <div class="pf-unit-wrap"><input type="number" inputmode="decimal" step="0.1" value="${weightVal}" placeholder="${weightUnit}" onchange="updateProfileField('weight', this.value)"><em>${weightUnit}</em></div></label>
+      <label class="pf-field"><span>Lifting experience</span>
+        <select onchange="updateProfileField('experience', this.value)">
+          ${opt('experience','','Select…')}${opt('experience','beginner','Beginner')}${opt('experience','intermediate','Intermediate')}${opt('experience','advanced','Advanced')}
+        </select><small class="pf-hint">Beginner: under 6 months · Intermediate: 6 months–2 years · Advanced: 2+ years</small></label>
+      <label class="pf-field"><span>Main goal</span>
+        <select onchange="updateProfileField('goal', this.value)">
+          ${opt('goal','','Select…')}${opt('goal','strength','Get stronger')}${opt('goal','hypertrophy','Build muscle')}${opt('goal','fatloss','Lose fat')}${opt('goal','general','General fitness')}${opt('goal','endurance','Endurance / conditioning')}
+        </select></label>
+      <label class="pf-field pf-wide"><span>Injuries or limitations</span>
+        <input type="text" value="${escapeHtml(p.injuries || '')}" placeholder="e.g. sore left shoulder (optional)" onchange="updateProfileField('injuries', this.value)"></label>
+      <p class="save-msg pf-msg" id="profile-msg"></p>
+    </div>`;
+
+  const bmi = profileBmi();
+  if(bmi){
+    html += `<p class="pf-bmi">BMI ${bmi.toFixed(1)}${bmi > 25 ? ' · suggestions use an adjusted body weight, since extra weight above BMI 25 is mostly not muscle' : ''}</p>`;
+  }
+
+  const usePlan = profile.suggestFrom === 'plan';
+  html += `<div class="profile-card"><p class="backup-title">Suggested starting weights</p>
+    <div class="pf-wide unit-toggle pf-source">
+      <button class="unit-opt ${usePlan ? '' : 'active'}" onclick="updateProfileField('suggestFrom','profile')">From my profile</button>
+      <button class="unit-opt ${usePlan ? 'active' : ''}" onclick="updateProfileField('suggestFrom','plan')">Plan's own numbers</button>
+    </div>`;
+  if(!profileIsComplete()){
+    html += `<p class="backup-sub">Fill in gender, body weight and experience to see weights based on your profile. Until then the plan's own start weights are used.</p>`;
+  }else{
+    html += `<p class="backup-sub">Per dumbbell for dumbbell moves. A starting point for working sets of 8–12 reps, so adjust after your first set. Machine stacks vary between gyms, so treat machine numbers as rough. Once you log an exercise, your history takes over.</p>`;
+    program.forEach(day => {
+      const items = day.exercises.map(ex => {
+        const s = getStartSuggestion(ex);
+        const last = lastSessionFor(day.id, ex);
+        let val;
+        if(ex.bw) val = 'Bodyweight';
+        else if(s) val = s.text + (s.source === 'profile' && s.planText && s.planText !== s.text ? ` <small>(plan: ${s.planText})</small>` : '')
+          + (s.source === 'plan' && !usePlan ? ' <small>(plan)</small>' : '');
+        else val = '—';
+        return `<div class="pf-sugg-row"><span>${escapeHtml(ex.name)}${last && last.length ? ' <small>· logged</small>' : ''}</span><span class="pf-sugg-val">${val}</span></div>`;
+      }).join('');
+      html += `<p class="pf-sugg-day">${escapeHtml(day.name)}</p>${items}`;
+    });
+  }
+  html += `</div>`;
+
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('footer').innerHTML = '';
+}
+
+async function updateProfileField(field, value){
+  if(field === 'weight'){
+    const n = parseFloat(value);
+    profile.weightKg = n > 0 ? (weightUnit === 'kg' ? n : lbToKg(n)) : undefined;
+  }else if(field === 'heightCm' || field === 'age'){
+    const n = parseFloat(value);
+    profile[field] = n > 0 ? n : undefined;
+  }else{
+    profile[field] = value;
+  }
+  await saveProfile();
+  if(accessToken) autoPushToDrive();
+  render();
+  const el = document.getElementById('profile-msg');
+  if(el) el.textContent = 'Saved';
+}
+
+function updateHeightImperial(ft, inch){
+  const totalIn = profile.heightCm ? profile.heightCm / 2.54 : 0;
+  let curFt = totalIn ? Math.floor(totalIn / 12) : 0;
+  let curIn = totalIn ? Math.round(totalIn - curFt * 12) : 0;
+  if(ft !== null) curFt = parseFloat(ft) || 0;
+  if(inch !== null) curIn = parseFloat(inch) || 0;
+  const cm = (curFt * 12 + curIn) * 2.54;
+  updateProfileField('heightCm', cm > 0 ? String(cm) : '');
 }
 
 /* ===================== Rest timer ===================== */
@@ -3084,6 +3377,7 @@ function exportBackupJson(){
     exportedAt: new Date().toISOString(),
     weightUnit,
     header: appHeader,
+    profile,
     program,
     history
   };
@@ -3147,6 +3441,7 @@ function handleImportFile(input){
       history: hist,
       program: prog,
       header: data.header && data.header.title ? data.header : null,
+      profile: data.profile && typeof data.profile === 'object' && !Array.isArray(data.profile) ? data.profile : null,
       weightUnit: data.weightUnit === 'kg' || data.weightUnit === 'lb' ? data.weightUnit : null
     };
     showImportChoice(file.name);
@@ -3191,6 +3486,10 @@ async function applyImport(mode){
       await saveHeader();
       renderHeader();
     }
+    if(p.profile){
+      profile = p.profile;
+      await saveProfile();
+    }
     if(p.weightUnit) setWeightUnit(p.weightUnit);
   }else{
     history = mergeHistories(history, p.history);
@@ -3212,6 +3511,7 @@ async function applyImport(mode){
   await loadProgram();
   await loadHistory();
   await loadHeader();
+  await loadProfile();
   loadWeightUnit();
   loadRestSettings();
   document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
