@@ -4,6 +4,9 @@
 
 At its core, it's a workout logger: each training day shows a list of exercises with target rep ranges, input fields for weight and reps per set, and a "last time" comparison so you can see exactly what you did last session before you try to beat it. Saving a session checks every exercise against your all-time best using an estimated one-rep-max formula and flags a PR badge when you've topped it, with separate handling for bodyweight moves like pull-ups and push-ups, where reps rather than load are the real progress signal.
 
+**Profile**
+The Profile tab stores your name, gender, age, height, body weight, lifting experience, main goal and any injuries. Gender, body weight and experience are used to suggest a starting weight for every exercise you haven't logged yet. The estimate also adjusts for age, and for height via BMI: above BMI 25 only part of the extra weight counts. The tab lists the suggestions for your whole program, and you can switch back to the plan's own start weights at any time. The profile also prefills the Personalize wizard and syncs with Google Drive and backups.
+
 **Personalize Wizard**
 A personalization wizard asks five questions, your goal, experience level, training days per week, available equipment, and an optional focus muscle, then generates a tailored split by pulling from a tagged exercise database, with a 10-second animated loading screen and rotating motivational text while it works. It launches automatically for first-time users and can be rerun anytime, offering to replace or merge with whatever program you already have.
 
